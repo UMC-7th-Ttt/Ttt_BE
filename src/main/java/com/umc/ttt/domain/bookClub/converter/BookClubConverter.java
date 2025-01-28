@@ -4,8 +4,10 @@ import com.umc.ttt.domain.book.dto.BookResponseDTO;
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
 import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
+import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
 import com.umc.ttt.domain.member.dto.MemberResponseDTO;
+import com.umc.ttt.domain.member.entity.Member;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -84,6 +86,20 @@ public class BookClubConverter {
                 .endDate(bookClub.getEndDate())
                 .recuitNumber(bookClub.getRecruitNumber())
                 .bookInfo(getBookDetailResultDTO)
+                .build();
+    }
+
+    public static BookClubMember toJoinBookClub(BookClub bookClub, Member member) {
+        return BookClubMember.builder()
+                .bookClub(bookClub)
+                .member(member)
+                .build();
+    }
+
+    public static BookClubResponseDTO.joinBookClubResultDTO toJoinBookClubResultDTO(BookClubMember bookClub) {
+        return BookClubResponseDTO.joinBookClubResultDTO.builder()
+                .id(bookClub.getId())
+                .bookClubId(bookClub.getBookClub().getId())
                 .build();
     }
 }

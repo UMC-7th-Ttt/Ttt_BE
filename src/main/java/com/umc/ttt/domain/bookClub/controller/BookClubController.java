@@ -4,6 +4,7 @@ import com.umc.ttt.domain.bookClub.converter.BookClubConverter;
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
 import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
+import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.service.BookClubQueryService;
 import com.umc.ttt.domain.bookClub.service.BookClubService;
 import com.umc.ttt.domain.bookLetter.validation.annotataion.CheckPage;
@@ -32,7 +33,7 @@ public class BookClubController {
     }
 
     @PatchMapping("/{bookClubId}")
-    @Operation(summary = "챌마다 북클럽 수정(관리자)",description = "책마다 북클럽을 수정하는 API입니다.")
+    @Operation(summary = "책마다 북클럽 수정(관리자)",description = "책마다 북클럽을 수정하는 API입니다.")
     public ApiResponse<BookClubResponseDTO.AddUpdateResultDTO> update(@PathVariable(name="bookClubId") Long bookClubId, @RequestBody @Valid BookClubRequestDTO.AddUpdateDTO request) {
         BookClub bookClub = bookClubService.updateBookClub(bookClubId,request);
         return ApiResponse.onSuccess(BookClubConverter.addUpdateResultDTO(bookClub));
@@ -69,11 +70,20 @@ public class BookClubController {
     }
 
     @GetMapping("/{bookClubId}/join")
-    @Operation(summary = "책마다 북클럽 가입하기 페이지 조회",description = "책마다 북클럽 가입하기 페이지를 조회하는 API입니다. 책 정보, 책마다 북클럽 정보를 제공합니다.")
+    @Operation(summary = "책마다 북클럽 가입 페이지 조회",description = "책마다 북클럽 가입 페이지를 조회하는 API입니다. 책 정보, 책마다 북클럽 정보를 제공합니다.")
     public ApiResponse<BookClubResponseDTO.getBookClubJoinPageResultDTO> getBookClubJoinPage(@PathVariable(name="bookClubId") Long bookClubId) {
         // TODO: 로그인한 회원 정보로 변경
         Member member = memberRepository.findById(1L).get();
         BookClubResponseDTO.getBookClubJoinPageResultDTO bookClub = bookClubQueryService.getBookClubJoinPageDTO(bookClubId, member);
         return ApiResponse.onSuccess(bookClub);
+    }
+
+    @PostMapping("/{bookClubId}/join")
+    @Operation(summary = "책마다 북클럽 가입하기",description = "책마다 북클럽 가입하기 API입니다.")
+    public ApiResponse<BookClubResponseDTO.joinBookClubResultDTO> joinBookClub(@PathVariable(name="bookClubId") Long bookClubId) {
+        // TODO: 로그인한 회원 정보로 변경
+        Member member = memberRepository.findById(1L).get();
+        BookClubMember bookClubMember = bookClubService.joinBookClub(bookClubId, member);
+        return ApiResponse.onSuccess(BookClubConverter.toJoinBookClubResultDTO(bookClubMember));
     }
 }

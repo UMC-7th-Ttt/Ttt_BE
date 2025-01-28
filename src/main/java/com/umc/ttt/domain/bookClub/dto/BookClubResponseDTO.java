@@ -83,4 +83,13 @@ public class BookClubResponseDTO {
         Integer recuitNumber;
         BookResponseDTO.GetBookDetailResultDTO bookInfo;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class joinBookClubResultDTO {
+        Long id;
+        Long bookClubId;
+    }
 }
