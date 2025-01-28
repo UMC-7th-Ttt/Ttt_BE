@@ -27,6 +27,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 회원
     PERMISSION_DENIED(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"MEMBER404", "회원을 찾을 수 없습니다."),
 
     // 스크랩
     FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "FOLDER404", "스크랩 폴더가 존재하지 않습니다."),
@@ -56,6 +57,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 북클럽 관련
     BOOK_CLUB_NOT_FOUND(HttpStatus.NOT_FOUND,"BOOKCLUB401", "존재하지 않는 북클럽입니다."),
+
+    // 서평 관련
+    RIVIEW_NOT_RANKING_RANGE(HttpStatus.BAD_REQUEST, "REVIEW401", "별점은 최소 1점, 최대 5점이며 0.5간격입니다."),
 
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
