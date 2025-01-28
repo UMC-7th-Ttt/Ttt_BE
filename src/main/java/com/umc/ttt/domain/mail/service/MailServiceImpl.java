@@ -120,4 +120,6 @@ public class MailServiceImpl implements MailService {
             throw new EMailHandler(ErrorStatus.UNAUTHORIZED_EMAIL);
         }
     }
+
+
 }
