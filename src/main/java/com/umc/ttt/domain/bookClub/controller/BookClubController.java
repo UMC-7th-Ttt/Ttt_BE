@@ -67,4 +67,13 @@ public class BookClubController {
         BookClubResponseDTO.getBookClubDetailsResultDTO bookClub = bookClubQueryService.getBookClubDetails(bookClubId, member);
         return ApiResponse.onSuccess(bookClub);
     }
+
+    @GetMapping("/{bookClubId}/join")
+    @Operation(summary = "책마다 북클럽 가입하기 페이지 조회",description = "책마다 북클럽 가입하기 페이지를 조회하는 API입니다. 책 정보, 책마다 북클럽 정보를 제공합니다.")
+    public ApiResponse<BookClubResponseDTO.getBookClubJoinPageResultDTO> getBookClubJoinPage(@PathVariable(name="bookClubId") Long bookClubId) {
+        // TODO: 로그인한 회원 정보로 변경
+        Member member = memberRepository.findById(1L).get();
+        BookClubResponseDTO.getBookClubJoinPageResultDTO bookClub = bookClubQueryService.getBookClubJoinPageDTO(bookClubId, member);
+        return ApiResponse.onSuccess(bookClub);
+    }
 }

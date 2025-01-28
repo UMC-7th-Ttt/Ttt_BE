@@ -76,4 +76,14 @@ public class BookClubConverter {
                 .members(memberInfoDTOList)
                 .build();
     }
+
+    public static BookClubResponseDTO.getBookClubJoinPageResultDTO toGetBookClubJoinPageResultDTO(BookClub bookClub, BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO) {
+        return BookClubResponseDTO.getBookClubJoinPageResultDTO.builder()
+                .bookClubId(bookClub.getId())
+                .startDate(bookClub.getStartDate())
+                .endDate(bookClub.getEndDate())
+                .recuitNumber(bookClub.getRecruitNumber())
+                .bookInfo(getBookDetailResultDTO)
+                .build();
+    }
 }
