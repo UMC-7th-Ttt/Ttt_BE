@@ -76,4 +76,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     List<Place> findPlacesByCategory(PlaceCategory placeCategory);
     List<Place> findAllByIdGreaterThanEqual(long l);
+
+    Place findPlaceByTitle(String title);
 }

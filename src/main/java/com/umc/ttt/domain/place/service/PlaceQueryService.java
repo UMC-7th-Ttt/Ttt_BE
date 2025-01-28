@@ -11,4 +11,6 @@ public interface PlaceQueryService {
     PlaceResponseDTO.PlaceListDTO searchPlaceList(String keyword, Long cursor, int limit, Member member);
 
     PlaceResponseDTO.PlaceSuggestListDTO suggestPlaces(Member member);
+
+    PlaceResponseDTO.EditorPickPlaceListDTO getEditorPickPlaces(Member member);
 }
