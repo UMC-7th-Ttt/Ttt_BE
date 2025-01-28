@@ -53,12 +53,6 @@ jobs:
         if: contains(github.ref, 'dev')
         run: ./gradlew build -x test
 
-      ## Start Redis
-      - name: Start Redis
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          redis-version: 6
-          
       ## docker build & push to production
       - name: Docker build & push to prod
         if: contains(github.ref, 'dev')

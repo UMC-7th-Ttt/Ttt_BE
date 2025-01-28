@@ -7,8 +7,10 @@ import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.MemberPreferedCategory;
+import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +27,10 @@ import java.util.stream.Collectors;
 public class BookQueryServiceImpl implements BookQueryService {
 
     private final BookRepository bookRepository;
+    private final BookScrapRepository bookScrapRepository;
 
     @Override
-    public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit) {
+    public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member) {
         Pageable pageable = PageRequest.of(0, limit + 1);
         List<Book> books = bookRepository.findBooksByKeyword(keyword, cursor, pageable);
 
@@ -38,12 +41,13 @@ public class BookQueryServiceImpl implements BookQueryService {
         long nextCursor = books.isEmpty() ? null : books.get(books.size() - 1).getId();
         boolean hasNext = books.size() > limit;
         List<Book> paginatedBooks = hasNext ? books.subList(0, limit) : books;
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
 
-        return BookConverter.toSearchBookResultDTO(paginatedBooks, nextCursor, limit, hasNext);
+        return BookConverter.toSearchBooksResultDTO(paginatedBooks, nextCursor, limit, hasNext, scrapedBookIds);
     }
 
     @Override
-    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName) {
+    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
         // 카테고리 매핑 정의
         Map<String, List<String>> categoryMapping = Map.of(
                 "koreanLiterature", Arrays.asList("판타지", "미스터리", "로맨스", "소설", "시"),
@@ -72,7 +76,9 @@ public class BookQueryServiceImpl implements BookQueryService {
                         }
                 ));
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
     }
 
     @Override
@@ -97,6 +103,18 @@ public class BookQueryServiceImpl implements BookQueryService {
                         }
                 ));
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
+    }
+
+    @Override
+    public BookResponseDTO.GetBookDetailResultDTO getBookDetails(long bookId, Member member) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new PlaceHandler(ErrorStatus.BOOK_NOT_FOUND));
+
+        boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
+
+        return BookConverter.toGetBookDetailResultDTO(book, isScraped);
     }
 }

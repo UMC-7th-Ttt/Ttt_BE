@@ -16,6 +16,7 @@ import com.umc.ttt.domain.bookClub.repository.ReadingRecordRepository;
 import com.umc.ttt.domain.member.converter.MemberConverter;
 import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
     private final BookClubMemberRepository bookClubMemberRepository;
     private final ReadingRecordRepository readingRecordRepository;
     private final BookRepository bookRepository;
+    private final BookScrapRepository bookScrapRepository;
 
     @Override
     public BookClubResponseDTO.getBookClubDetailsResultDTO getBookClubDetails(Long bookClubId, Member member) {
@@ -45,7 +47,8 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         // 책 정보 조회
         Book book = bookRepository.findBookByBookClub(bookClub)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_NOT_FOUND));
-        BookResponseDTO.BookInfoDTO bookInfoDTO = BookConverter.toBookInfoDTO(book);
+        boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
+        BookResponseDTO.BookInfoDTO bookInfoDTO = BookConverter.toBookInfoDTO(book, isScraped);
 
         // BookClubMember에서 멤버 리스트 조회
         List<BookClubMember> bookClubMembers = bookClubMemberRepository.findByBookClub(bookClub);
