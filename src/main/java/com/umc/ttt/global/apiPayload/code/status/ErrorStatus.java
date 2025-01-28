@@ -28,6 +28,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 회원
     PERMISSION_DENIED(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER401", "사용자가 존재하지 않습니다."),
+    MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER400", "이미 존재하는 사용자입니다."),
 
     //jwt
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 token입니다.."),
