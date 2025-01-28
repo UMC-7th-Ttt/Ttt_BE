@@ -70,6 +70,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
 	implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '5.9.2'
 
+	// email smtp
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 }
 

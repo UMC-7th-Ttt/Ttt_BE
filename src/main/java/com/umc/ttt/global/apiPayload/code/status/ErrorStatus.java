@@ -34,6 +34,9 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 token입니다.."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "LOGIN401", "refreshtoken이 만료되었습니다. 로그인해주세요."),
 
+    //email
+    UNAUTHORIZED_EMAIL(HttpStatus.UNAUTHORIZED, "EMAIL401", "본인 인증에 실패했습니다."),
+
     // 스크랩
     FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "FOLDER404", "스크랩 폴더가 존재하지 않습니다."),
     INVALID_FOLDER(HttpStatus.BAD_REQUEST, "FOLDER400", "유효하지 않은 폴더 위치입니다."),
