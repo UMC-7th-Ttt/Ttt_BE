@@ -76,6 +76,21 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, memberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
     }
 
+    @Override
+    public BookClubResponseDTO.getBookClubJoinPageResultDTO getBookClubJoinPageDTO(Long bookClubId, Member member) {
+        // BookClub 정보 조회
+        BookClub bookClub = bookClubRepository.findById(bookClubId)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
+
+        // 책 정보 조회
+        Book book = bookRepository.findBookByBookClub(bookClub)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_NOT_FOUND));
+        boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
+        BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO = BookConverter.toGetBookDetailResultDTO(book, isScraped);
+
+        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO);
+    }
+
     public int calculateElapsedWeeks(LocalDate startDate, int totalWeeks) {
         // 오늘 날짜 기준 경과한 주 계산 (최소 1주)
         long elapsedWeeks = Math.max(1, ChronoUnit.WEEKS.between(startDate, LocalDate.now()));

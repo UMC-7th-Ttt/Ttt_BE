@@ -64,6 +64,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 북클럽 멤버
     MEMBER_NOT_FOUND_IN_BOOK_CLUB(HttpStatus.NOT_FOUND,"BOOKCLUB_MEMBER404", "존재하지 않는 북클럽 멤버입니다."),
+    BOOK_CLUB_MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"BOOKCLUB_MEMBER401", "이미 가입한 북클럽입니다."),
 
     // 참여 인증
     READING_RECORED_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORED404", "존재하지 않는 참여 인증입니다."),
