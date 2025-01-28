@@ -17,9 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,6 +120,21 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
         List<Long> scrapedPlaceIds = placeScrapRepository.findScrapedPlaceIdsByMemberAndPlaces(member, randomPlaces);
 
         return PlaceConverter.toPlaceSuggestListDTO(randomPlaces, scrapedPlaceIds);
+    }
+
+    @Override
+    public PlaceResponseDTO.EditorPickPlaceListDTO getEditorPickPlaces(Member member) {
+        // 에디터 픽 공간 5곳 - 로이 픽
+        List<String> titles = Arrays.asList("북앤드로잉", "유어마인드", "북파크", "땡스북스", "책방오늘");
+
+        List<Place> places = titles.stream()
+                .map(placeRepository::findPlaceByTitle)
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<Long> scrapedPlaceIds = placeScrapRepository.findScrapedPlaceIdsByMemberAndPlaces(member, places);
+
+        return PlaceConverter.toEditorPickPlaceListDTO(places, scrapedPlaceIds);
     }
 
 }

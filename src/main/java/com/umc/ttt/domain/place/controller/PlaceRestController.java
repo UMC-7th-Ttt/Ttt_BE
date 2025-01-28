@@ -104,4 +104,12 @@ public class PlaceRestController {
         Member member = memberRepository.findById(1L).get();
         return ApiResponse.onSuccess(placeQueryService.suggestPlaces(member));
     }
+
+    @GetMapping("/editor-pick")
+    @Operation(summary = "공간 에디터 픽", description = "에디터가 픽한 공간 5곳을 반환합니다.")
+    public ApiResponse<PlaceResponseDTO.EditorPickPlaceListDTO> getEditorPickPlaces() {
+        // TODO: 로그인한 회원 정보로 변경
+        Member member = memberRepository.findById(1L).get();
+        return ApiResponse.onSuccess(placeQueryService.getEditorPickPlaces(member));
+    }
 }

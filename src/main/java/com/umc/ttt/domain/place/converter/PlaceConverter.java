@@ -81,4 +81,25 @@ public class PlaceConverter {
                 .places(placePreviewDTOs)
                 .build();
     }
+
+    public static PlaceResponseDTO.EditorPickPlaceDTO toEditorPickPlaceDTO(Place place, boolean isScraped) {
+        return PlaceResponseDTO.EditorPickPlaceDTO.builder()
+                .placeId(place.getId())
+                .title(place.getTitle())
+                .category(place.getCategory())
+                .image(place.getImage())
+                .curationTitle(place.getCurationTitle())
+                .isScraped(isScraped)
+                .build();
+    }
+
+    public static PlaceResponseDTO.EditorPickPlaceListDTO toEditorPickPlaceListDTO(List<Place> places, List<Long> scrapedPlaceIds) {
+        List<PlaceResponseDTO.EditorPickPlaceDTO> editorPickPlaceDTOS = places.stream()
+                .map(place -> toEditorPickPlaceDTO(place, scrapedPlaceIds.contains(place.getId())))
+                .toList();
+
+        return PlaceResponseDTO.EditorPickPlaceListDTO.builder()
+                .places(editorPickPlaceDTOS)
+                .build();
+    }
 }
