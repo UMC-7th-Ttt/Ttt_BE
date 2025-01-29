@@ -8,6 +8,7 @@ import com.umc.ttt.domain.member.repository.MemberRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.GeneralException;
 import com.umc.ttt.global.apiPayload.exception.handler.JwtHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.MemberHandler;
 import com.umc.ttt.global.jwt.entity.RefreshToken;
 import com.umc.ttt.global.jwt.repository.RefreshTokenRepository;
 import com.umc.ttt.global.jwt.service.JwtService;
@@ -96,5 +97,14 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         tokenRepository.save(refreshToken);
 
         return newAccessToken;
+    }
+
+    @Override
+    public void isEmailDuplicate(String email) throws MemberHandler {
+        log.info("여기1");
+        if (memberRepository.findByEmail(email).isPresent()) {
+            log.info("여기2");
+            throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_EXISTS);
+        }
     }
 }

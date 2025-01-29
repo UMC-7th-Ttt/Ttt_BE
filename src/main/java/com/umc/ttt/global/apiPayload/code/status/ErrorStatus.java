@@ -28,10 +28,14 @@ public enum ErrorStatus implements BaseErrorCode {
     // 회원
     PERMISSION_DENIED(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER401", "사용자가 존재하지 않습니다."),
+    MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER400", "이미 존재하는 사용자입니다."),
 
     //jwt
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 token입니다.."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "LOGIN401", "refreshtoken이 만료되었습니다. 로그인해주세요."),
+
+    //email
+    UNAUTHORIZED_EMAIL(HttpStatus.UNAUTHORIZED, "EMAIL401", "본인 인증에 실패했습니다."),
 
     // 스크랩
     FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "FOLDER404", "스크랩 폴더가 존재하지 않습니다."),

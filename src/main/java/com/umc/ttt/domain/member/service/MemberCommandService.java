@@ -11,4 +11,6 @@ public interface MemberCommandService {
     void signOut(Optional<String> userEmail) throws Exception;
 
     String refreshAccessToken(String accessToken) throws Exception;
+
+    void isEmailDuplicate(String email) throws Exception;
 }

@@ -40,6 +40,8 @@ public class MemberController {
     })
     public ApiResponse<String> signOut(@RequestHeader("Authorization") String token) throws Exception {
         String jwtToken = token.substring(7);
+        tokenService.removeRefreshToken(jwtToken);
+
         var userEmail = jwtService.extractEmail(jwtToken);
         memberCommandService.signOut(userEmail);
         return ApiResponse.onSuccess("회원 탈퇴에 성공했습니다!");
@@ -47,7 +49,7 @@ public class MemberController {
 
 
     //JWT 서비스 테스트를 위한 API
-    @GetMapping("/jwt-test")
+    @GetMapping("/api/jwt-test")
     @Operation(summary = "jwtTest 요청", description = "서버 테스트용 api입니다. 연동x")
     public ApiResponse<String> jwtTest() {
         return ApiResponse.onSuccess("jwtTest 요청 성공");
@@ -70,6 +72,13 @@ public class MemberController {
 
         String newAccessToken = memberCommandService.refreshAccessToken(jwtToken);
         return ApiResponse.onSuccess(MemberConverter.updateResultDTO(newAccessToken));
+    }
+
+    @PostMapping("/api/email-duplicated")
+    @Operation(summary = "이메일 중복 검사", description = "")
+    public ApiResponse<String> duplicatedEmail(@RequestHeader("email") String email) throws Exception {
+        memberCommandService.isEmailDuplicate(email);
+        return ApiResponse.onSuccess("사용가능한 이메일입니다.");
     }
 
 }

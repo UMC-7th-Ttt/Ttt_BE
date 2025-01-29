@@ -183,4 +183,5 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return request.getRequestURI().contains("token/");
     }
+
 }
