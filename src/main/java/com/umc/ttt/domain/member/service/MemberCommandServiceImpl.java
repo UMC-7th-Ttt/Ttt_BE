@@ -5,6 +5,8 @@ import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.enums.ProviderType;
 import com.umc.ttt.domain.member.entity.enums.Role;
 import com.umc.ttt.domain.member.repository.MemberRepository;
+import com.umc.ttt.domain.scrap.entity.ScrapFolder;
+import com.umc.ttt.domain.scrap.repository.ScrapFolderRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.GeneralException;
 import com.umc.ttt.global.apiPayload.exception.handler.JwtHandler;
@@ -18,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +33,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenRepository tokenRepository;
+    private final ScrapFolderRepository scrapFolderRepository;
 
     @Override
     public void signUp(MemberSignUpDTO memberSignUpDto) throws Exception {
@@ -58,6 +63,14 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
         member.passwordEncode(passwordEncoder);
         memberRepository.save(member);
+
+        // 기본 스크랩 폴더 생성
+        List<ScrapFolder> scrapFolders = Arrays.asList(
+                ScrapFolder.builder().name("공간").member(member).build(),
+                ScrapFolder.builder().name("도서").member(member).build()
+        );
+
+        scrapFolderRepository.saveAll(scrapFolders);
     }
 
     @Override
