@@ -18,9 +18,9 @@ public class MemberSignUpDTO {//자체 로그인 회원가입 API RequestBody / 
     
     @NotNull(message = "비밀번호는 필수입니다.")
     private String password;
-//
-//    private String nickname;
-//    private String profileUrl;
+
+    private String nickname;
+    private String profileUrl;
 }
 
 
