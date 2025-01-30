@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Jwt 인증 필터
@@ -45,7 +46,8 @@ import java.io.IOException;
 //@EnableWebSecurity(debug = true)
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/api/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+//    private static final String NO_CHECK_URL = "/api/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+    private static final Set<String> NO_CHECK_URLS = Set.of("/api/login", "/api/refresh-token","/api/logout");
 
 
     private final JwtService jwtService;
@@ -55,10 +57,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
-            return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+        if (NO_CHECK_URLS.contains(request.getRequestURI())) {
+            log.info("요청 uri: "+request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
         }
+
 
 //        // 사용자 요청 헤더에서 RefreshToken 추출
 //        // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null을 반환
@@ -181,7 +185,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      * 기존에 AccessToken의 값이 없는 경우 토큰 검사를 생략하는 조건문을 두었었는데, RefreshToken 재발급이나 로그아웃 기능의 경우, 필터를 수행하면 토큰의 값은 있지만 토큰이 유효하지 않을 수 있기 때문에 이렇게 로직을 변경하였습니다.*/
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getRequestURI().contains("token/");
+        return request.getRequestURI().contains("api/token/");
     }
 
 }

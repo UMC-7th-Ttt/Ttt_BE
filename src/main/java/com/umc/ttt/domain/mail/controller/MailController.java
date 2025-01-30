@@ -25,7 +25,7 @@ public class MailController {
     /**
      * 인증번호 발송 메소드
      */
-    @PostMapping("/api/users/mail")
+    @PostMapping("/api/users/code")
     @Operation(summary = "인증번호 요청", description = "인증번호 요청 api입니다. request의 담긴 email로 발송됩니다.")
     public ApiResponse<String> mailSend(@RequestBody @Valid MailRequestDTO.Mail mailRequest) {
         mailService.sendMail(mailRequest.getEmail());
