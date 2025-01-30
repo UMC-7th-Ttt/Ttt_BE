@@ -10,5 +10,7 @@ public interface BookQueryService {
 
     BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member);
 
+    BookResponseDTO.SuggestBooksResultDTO suggestBooksByEditor(Member member);
+
     BookResponseDTO.GetBookDetailResultDTO getBookDetails(long bookId, Member member);
 }

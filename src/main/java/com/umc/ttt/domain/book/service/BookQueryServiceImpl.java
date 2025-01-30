@@ -16,10 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,6 +103,21 @@ public class BookQueryServiceImpl implements BookQueryService {
         List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
 
         return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
+    }
+
+    @Override
+    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByEditor(Member member) {
+        // TODO: 에디터 픽으로 변경
+        List<String> titles = Arrays.asList("이처럼 사소한 것들", "급류", "서랍에 저녁을 넣어 두었다 - 2024 노벨문학상 수상작가", "희랍어 시간 - 2024 노벨문학상 수상작가", "너의 유토피아");
+
+        List<Book> books = titles.stream()
+                .map(bookRepository::findBookByTitle)
+                .flatMap(Optional::stream)
+                .toList();
+
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(books, scrapedBookIds);
     }
 
     @Override
