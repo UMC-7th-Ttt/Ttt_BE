@@ -46,7 +46,6 @@ import java.util.Set;
 //@EnableWebSecurity(debug = true)
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-//    private static final String NO_CHECK_URL = "/api/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
     private static final Set<String> NO_CHECK_URLS = Set.of("/api/login", "/api/refresh-token","/api/logout");
 
 
@@ -62,59 +61,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-
-//        // 사용자 요청 헤더에서 RefreshToken 추출
-//        // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null을 반환
-//        // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
-//        // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
-//        String refreshToken = jwtService.extractRefreshToken(request)
-//                .filter(jwtService::isTokenValid)
-//                .orElse(null);
-//
-//        // 리프레시 토큰이 요청 헤더에 존재했다면, 사용자가 AccessToken이 만료되어서
-//        // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단 후,
-//        // 일치한다면 AccessToken을 재발급해준다.
-//        if (refreshToken != null) {
-//            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-//            return; // RefreshToken을 보낸 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
-//        }
-
-        // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-        // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
-        // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
-//        if (refreshToken == null) {
-//            checkAccessTokenAndAuthentication(request, response, filterChain);
-//        }
         checkAccessTokenAndAuthentication(request, response, filterChain);
 
     }
-    /**
-     *  [리프레시 토큰으로 유저 정보 찾기 & 액세스 토큰/리프레시 토큰 재발급 메소드]
-     *  파라미터로 들어온 헤더에서 추출한 리프레시 토큰으로 DB에서 유저를 찾고, 해당 유저가 있다면
-     *  JwtService.createAccessToken()으로 AccessToken 생성,
-     *  reIssueRefreshToken()로 리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드 호출
-     *  그 후 JwtService.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
-     */
-//    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-//        memberRepository.findByRefreshToken(refreshToken)
-//                .ifPresent(member -> {
-//                    String reIssuedRefreshToken = reIssueRefreshToken(member);
-//                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(member.getEmail()),
-//                            reIssuedRefreshToken);
-//                });
-//    }
-//    /**
-//     * [리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드]
-//     * jwtService.createRefreshToken()으로 리프레시 토큰 재발급 후
-//     * DB에 재발급한 리프레시 토큰 업데이트 후 Flush
-//     */
-//    private String reIssueRefreshToken(Member member) {
-//        String reIssuedRefreshToken = jwtService.createRefreshToken();
-//        member.updateRefreshToken(reIssuedRefreshToken);
-//        memberRepository.saveAndFlush(member);
-//        return reIssuedRefreshToken;
-//    }
 
     /**
      * [액세스 토큰 체크 & 인증 처리 메소드]
