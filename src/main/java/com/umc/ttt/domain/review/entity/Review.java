@@ -51,4 +51,23 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
+
+    public void setInfo(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public void setIsSecret(boolean isSecret) {
+        this.isSecret = isSecret;
+    }
+
+    public void setBook(Book book, double bookRanking) {
+        this.book = book;
+        this.bookRanking = bookRanking;
+    }
+
+    public void setPlace(Place place, double placeRanking) {
+        this.place = place;
+        this.placeRanking = placeRanking;
+    }
 }

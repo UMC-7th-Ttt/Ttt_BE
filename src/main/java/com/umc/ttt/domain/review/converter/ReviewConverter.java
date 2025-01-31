@@ -21,7 +21,7 @@ public class ReviewConverter {
                 .bookRanking(request.getBookRanking())
                 .placeRanking(request.getPlaceRanking())
                 .writeDate(request.getWriteDate())
-                .isSecret(request.isSecret())
+                .isSecret(request.getIsSecret())
                 .member(member)
                 .book(book)
                 .place(place)

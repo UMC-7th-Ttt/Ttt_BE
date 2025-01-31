@@ -49,7 +49,7 @@ public enum ErrorStatus implements BaseErrorCode {
     SCRAP_NOT_FOUND(HttpStatus.NOT_FOUND, "SCRAP404", "스크랩 내역이 존재하지 않습니다."),
 
     // 책 관련 에러
-    BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOK401", "책을 찾을 수 없습니다."),
+    BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOK404", "책을 찾을 수 없습니다."),
 
     // 책 카테고리
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKCATEGORY404", "해당 카테고리가 존재하지 않습니다."),
@@ -64,7 +64,17 @@ public enum ErrorStatus implements BaseErrorCode {
     BOOK_LETTER_BOOK_ALREADY_EXIST(HttpStatus.BAD_REQUEST,"BOOKLETTERBOOK402", "이미 진행되는 북레터 북입니다."),
 
     // 북클럽 관련
-    BOOK_CLUB_NOT_FOUND(HttpStatus.NOT_FOUND,"BOOKCLUB401", "존재하지 않는 북클럽입니다."),
+    BOOK_CLUB_NOT_FOUND(HttpStatus.NOT_FOUND,"BOOKCLUB404", "존재하지 않는 북클럽입니다."),
+
+    // 북클럽 멤버
+    MEMBER_NOT_FOUND_IN_BOOK_CLUB(HttpStatus.NOT_FOUND,"BOOKCLUB_MEMBER404", "존재하지 않는 북클럽 멤버입니다."),
+    BOOK_CLUB_MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"BOOKCLUB_MEMBER401", "이미 가입한 북클럽입니다."),
+
+    // 참여 인증
+    READING_RECORED_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORED404", "존재하지 않는 참여 인증입니다."),
+
+    // 리뷰 관련
+    INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "RIVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
 
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
