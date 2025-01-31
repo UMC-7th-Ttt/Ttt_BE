@@ -1,14 +1,25 @@
 package com.umc.ttt.domain.member.service;
 
+import com.umc.ttt.domain.book.entity.Book;
+import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.book.entity.BookFormatCategory;
+import com.umc.ttt.domain.book.repository.BookCategoryRepository;
+import com.umc.ttt.domain.book.repository.BookFormatCategoryRepository;
+import com.umc.ttt.domain.book.repository.BookRepository;
+import com.umc.ttt.domain.member.dto.MemberKeywordDTO;
 import com.umc.ttt.domain.member.dto.MemberSignUpDTO;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
 import com.umc.ttt.domain.member.entity.enums.ProviderType;
 import com.umc.ttt.domain.member.entity.enums.Role;
+import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.domain.member.repository.MemberRepository;
+import com.umc.ttt.domain.place.entity.enums.PlaceCategory;
 import com.umc.ttt.domain.scrap.entity.ScrapFolder;
 import com.umc.ttt.domain.scrap.repository.ScrapFolderRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.GeneralException;
+import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.JwtHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.MemberHandler;
 import com.umc.ttt.global.jwt.entity.RefreshToken;
@@ -20,9 +31,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,9 +44,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final JwtService jwtService;
     private final RefreshTokenRepository tokenRepository;
     private final ScrapFolderRepository scrapFolderRepository;
+    private final BookCategoryRepository bookCategoryRepository;
+    private final MemberPreferredCategoryRepository preferredCategoryRepository;
+    private final BookRepository bookRepository;
+    private final BookFormatCategoryRepository bookFormatCategoryRepository;
 
     @Override
-    public void signUp(MemberSignUpDTO memberSignUpDto) throws Exception {
+    public Member signUp(MemberSignUpDTO memberSignUpDto) throws Exception {
         Optional<Member> optionalMember = memberRepository.findByEmail(memberSignUpDto.getEmail());
 
         if (optionalMember.isPresent()) {
@@ -71,6 +85,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         );
 
         scrapFolderRepository.saveAll(scrapFolders);
+
+        return member;
     }
 
     @Override
@@ -114,10 +130,106 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     public void isEmailDuplicate(String email) throws MemberHandler {
-        log.info("여기1");
         if (memberRepository.findByEmail(email).isPresent()) {
-            log.info("여기2");
             throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_EXISTS);
         }
     }
+
+    @Override
+    public void isNicknameDuplicate(String nickname) throws Exception {
+        if (memberRepository.findByNickname(nickname).isPresent()) {
+            throw new MemberHandler(ErrorStatus.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
+
+    /**
+     * 장르 키워드 저장 (1,2,4 질문)
+     **/
+    @Override
+    public void saveGenreKeyword(Long memberId, List<String> keywords, Long bookId) throws Exception{
+        List<String> selectedCategories = new ArrayList<>();
+
+        // 예를 들어, 책 이름을 이용한 처리가 있을 경우 여기에 추가.
+        Book book = bookRepository.findBookById(bookId)
+                .orElseThrow(() -> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
+
+        // preferCategory1에서 상위 2개 선택
+        selectedCategories.addAll(extractTopCategories(keywords));
+        if (book.getBookCategory() != null && book.getBookCategory().getCategoryName() != null) {
+            selectedCategories.add(book.getBookCategory().getCategoryName());
+        }
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        for (String categoryName : selectedCategories) {
+                BookCategory bookCategory = bookCategoryRepository.findByCategoryName(categoryName)
+                        .orElseThrow(() -> new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+
+                if(!preferredCategoryRepository.existsMemberPreferredCategoriesByBookCategoryAndMember_Id(bookCategory,memberId)){
+                    MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
+                            .member(member)
+                            .bookCategory(bookCategory)
+                            .build();
+
+                    preferredCategoryRepository.save(preferredCategory);
+                }
+        }
+
+
+        if(!preferredCategoryRepository.existsMemberPreferredCategoriesByBookCategoryAndMember_Id(book.getBookCategory(),memberId)){
+            MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
+                    .member(member)
+                    .bookCategory(book.getBookCategory())
+                    .build();
+
+            preferredCategoryRepository.save(preferredCategory);
+        }
+    }
+
+    /**
+     * 분량, 장소 키워드 저장(3번 질문)
+     **/
+    @Override
+    public void saveFormatKeyword(Long memberId, List<String> keywords) throws Exception {
+        List<String> selectedCategories = new ArrayList<>();
+
+        // preferCategory1에서 상위 2개 선택
+        selectedCategories.addAll(extractTopCategories(keywords));
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        for (String categoryName : selectedCategories) {
+                BookFormatCategory bookFormatCategory = bookFormatCategoryRepository.findByCategoryName(categoryName)
+                        .orElseThrow(() -> new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+
+                if(!preferredCategoryRepository.existsByBookFormatCategoryAndMember_Id(bookFormatCategory,memberId)){
+                    MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
+                            .member(member)
+                            .bookFormatCategory(bookFormatCategory)
+                            .build();
+
+                    preferredCategoryRepository.save(preferredCategory);
+                }
+
+        }
+
+    }
+
+    public List<String> extractTopCategories(List<String> categories) throws Exception{
+        Map<String, Integer> frequencyMap = new HashMap<>();
+
+        for (String category : categories) {
+            frequencyMap.put(category, frequencyMap.getOrDefault(category, 0) + 1);
+        }
+
+        return frequencyMap.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue())) // 빈도수 정렬
+                .limit(2) // 상위 2개 선택
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
 }
+

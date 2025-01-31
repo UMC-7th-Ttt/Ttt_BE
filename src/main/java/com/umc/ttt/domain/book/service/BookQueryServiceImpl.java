@@ -6,7 +6,7 @@ import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.entity.Member;
-import com.umc.ttt.domain.member.entity.MemberPreferedCategory;
+import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
 import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
@@ -84,7 +84,7 @@ public class BookQueryServiceImpl implements BookQueryService {
     @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member) {
         List<BookCategory> preferedCategories = member.getPreferedCategories().stream()
-                .map(MemberPreferedCategory::getBookCategory)
+                .map(MemberPreferredCategory::getBookCategory)
                 .collect(Collectors.toList());
 
         if (preferedCategories.isEmpty()) {
