@@ -1,5 +1,7 @@
 package com.umc.ttt.domain.bookClub.dto;
 
+import com.umc.ttt.domain.book.dto.BookResponseDTO;
+import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,5 +57,39 @@ public class BookClubResponseDTO {
         LocalDate endDate;
         String comment;
         Integer recuitNumber;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getBookClubDetailsResultDTO {
+        Long bookClubId;
+        Integer elapsedWeeks;
+        Integer myCompletionRate;
+        Integer recommendedCompletionRate;
+        BookResponseDTO.BookInfoDTO bookInfo;
+        List<MemberResponseDTO.MemberInfoDTO> members;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getBookClubJoinPageResultDTO {
+        Long bookClubId;
+        LocalDate startDate;
+        LocalDate endDate;
+        Integer recuitNumber;
+        BookResponseDTO.GetBookDetailResultDTO bookInfo;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class joinBookClubResultDTO {
+        Long id;
+        Long bookClubId;
     }
 }

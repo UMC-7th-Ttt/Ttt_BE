@@ -70,7 +70,7 @@ public class BookLetterConverter {
                 .publisher(book.getBook().getPublisher())
                 .itemPage(book.getBook().getItemPage())
                 .categoryName(book.getBook().getBookCategory().getCategoryName())
-                .hasEbook(book.getBook().isHasEbook())
+                .hasEbook(book.getBook().getHasEbook())
                 .description(book.getBook().getDescription())
                 .build();
     }

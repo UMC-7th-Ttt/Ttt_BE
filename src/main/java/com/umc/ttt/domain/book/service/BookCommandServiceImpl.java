@@ -74,7 +74,7 @@ public class BookCommandServiceImpl implements BookCommandService {
                     BookFetchDTO.Item lookupItem = lookupResponse.getItem().get(0);
 
                     item.setItemPage(lookupItem.getItemPage());
-                    item.setHasEbook(lookupItem.isHasEbook());
+                    item.setHasEbook(lookupItem.getHasEbook());
                 }
 
                 Book bookEntity = BookConverter.toEntity(item, category);

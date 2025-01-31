@@ -1,6 +1,8 @@
 package com.umc.ttt.domain.place.repository;
 
 import com.umc.ttt.domain.place.entity.Place;
+import com.umc.ttt.domain.place.entity.enums.PlaceCategory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -63,4 +65,17 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             "+ sin(radians(:latitude)) * sin(radians(s2.x_pos)))) AS distance FROM place s2 WHERE s2.place_id = :cursor) ORDER BY places.distance ASC LIMIT :limit", nativeQuery = true)
     List<Place> findOrderByDistanceWithCursor(@Param("latitude") double latitude, @Param("longitude") double longitude, @Param("cursor") Long cursor, @Param("limit") int limit);
 
+    // 검색
+    @Query("""
+        SELECT p FROM Place p 
+        WHERE (p.title LIKE %:keyword% OR p.address LIKE %:keyword%)
+        AND p.id > :cursor 
+        ORDER BY p.id ASC
+    """)
+    List<Place> findPlacesByKeyword(@Param("keyword") String keyword, @Param("cursor") long cursor, Pageable pageable);
+
+    List<Place> findPlacesByCategory(PlaceCategory placeCategory);
+    List<Place> findAllByIdGreaterThanEqual(long l);
+
+    Place findPlaceByTitle(String title);
 }

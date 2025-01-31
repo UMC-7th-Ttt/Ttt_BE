@@ -7,17 +7,16 @@ import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.MemberPreferedCategory;
+import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,9 +24,10 @@ import java.util.stream.Collectors;
 public class BookQueryServiceImpl implements BookQueryService {
 
     private final BookRepository bookRepository;
+    private final BookScrapRepository bookScrapRepository;
 
     @Override
-    public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit) {
+    public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member) {
         Pageable pageable = PageRequest.of(0, limit + 1);
         List<Book> books = bookRepository.findBooksByKeyword(keyword, cursor, pageable);
 
@@ -38,12 +38,13 @@ public class BookQueryServiceImpl implements BookQueryService {
         long nextCursor = books.isEmpty() ? null : books.get(books.size() - 1).getId();
         boolean hasNext = books.size() > limit;
         List<Book> paginatedBooks = hasNext ? books.subList(0, limit) : books;
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
 
-        return BookConverter.toSearchBookResultDTO(paginatedBooks, nextCursor, limit, hasNext);
+        return BookConverter.toSearchBooksResultDTO(paginatedBooks, nextCursor, limit, hasNext, scrapedBookIds);
     }
 
     @Override
-    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName) {
+    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
         // 카테고리 매핑 정의
         Map<String, List<String>> categoryMapping = Map.of(
                 "koreanLiterature", Arrays.asList("판타지", "미스터리", "로맨스", "소설", "시"),
@@ -72,7 +73,9 @@ public class BookQueryServiceImpl implements BookQueryService {
                         }
                 ));
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
     }
 
     @Override
@@ -97,6 +100,33 @@ public class BookQueryServiceImpl implements BookQueryService {
                         }
                 ));
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
+    }
+
+    @Override
+    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByEditor(Member member) {
+        // TODO: 에디터 픽으로 변경
+        List<String> titles = Arrays.asList("이처럼 사소한 것들", "급류", "서랍에 저녁을 넣어 두었다 - 2024 노벨문학상 수상작가", "희랍어 시간 - 2024 노벨문학상 수상작가", "너의 유토피아");
+
+        List<Book> books = titles.stream()
+                .map(bookRepository::findBookByTitle)
+                .flatMap(Optional::stream)
+                .toList();
+
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+
+        return BookConverter.toSuggestBooksResultDTO(books, scrapedBookIds);
+    }
+
+    @Override
+    public BookResponseDTO.GetBookDetailResultDTO getBookDetails(long bookId, Member member) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new PlaceHandler(ErrorStatus.BOOK_NOT_FOUND));
+
+        boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
+
+        return BookConverter.toGetBookDetailResultDTO(book, isScraped);
     }
 }

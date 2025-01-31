@@ -36,5 +36,23 @@ public class BookResponseDTO {
         private String author;
         private String category;
         private String publisher;
+        private boolean isScraped;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetBookDetailResultDTO {
+        private Long id;
+        private String cover;
+        private String title;
+        private String author;
+        private String category;
+        private String publisher;
+        private int itemPage;
+        private String description;
+        private boolean hasEbook;
+        private boolean isScraped;
     }
 }

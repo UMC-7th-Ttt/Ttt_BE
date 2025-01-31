@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ScrapCommandCommandServiceImpl implements ScrapCommandService {
+public class ScrapCommandServiceImpl implements ScrapCommandService {
 
     private final PlaceRepository placeRepository;
     private final PlaceScrapRepository placeScrapRepository;

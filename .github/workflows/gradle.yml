@@ -61,6 +61,11 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_REPO }} .
           docker push ${{ secrets.DOCKER_REPO }}
 
+      ## Docker 권한 설정 추가
+      - name: Set up Docker permissions
+        run: |
+          sudo chmod 666 /var/run/docker.sock
+
       ## deploy to production
       - name: Deploy to prod
         uses: appleboy/ssh-action@v0.1.6

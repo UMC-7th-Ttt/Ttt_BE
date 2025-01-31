@@ -1,13 +1,16 @@
 package com.umc.ttt.domain.bookClub.service;
 
-import com.umc.ttt.domain.bookClub.converter.BookClubConvert;
+import com.umc.ttt.domain.bookClub.converter.BookClubConverter;
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
+import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.handler.BookClubHandler;
+import com.umc.ttt.domain.bookClub.repository.BookClubMemberRepository;
 import com.umc.ttt.domain.bookClub.repository.BookClubRepository;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterBookRepository;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
 import com.umc.ttt.domain.bookLetter.handler.BookLetterBookHandler;
+import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookClubServiceImpl implements BookClubService{
     private final BookClubRepository bookClubRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
+    private final BookClubMemberRepository bookClubMemberRepository;
 
     @Override
     @Transactional
@@ -30,7 +34,7 @@ public class BookClubServiceImpl implements BookClubService{
         if(existBookClub) {
             throw new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_ALREADY_EXIST);
         }
-        BookClub bookClub = BookClubConvert.toBookClub(request, bookLetterBook);
+        BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook);
 
         return bookClubRepository.save(bookClub);
     }
@@ -77,5 +81,20 @@ public class BookClubServiceImpl implements BookClubService{
     public BookClub getBookClubForManager(Long bookClubId) {
         BookClub bookClub = bookClubRepository.findById(bookClubId).orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
         return bookClub;
+    }
+
+    @Override
+    @Transactional
+    public BookClubMember joinBookClub(Long bookClubId, Member member) {
+        BookClub bookClub = bookClubRepository.findById(bookClubId).orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
+
+        if (bookClubMemberRepository.existsByBookClubAndMember(
+                bookClubRepository.getReferenceById(bookClubId), member)) {
+            throw new BookClubHandler(ErrorStatus.BOOK_CLUB_MEMBER_ALREADY_EXISTS);
+        }
+
+        BookClubMember bookClubMember = BookClubConverter.toJoinBookClub(bookClub, member);
+
+        return bookClubMemberRepository.save(bookClubMember);
     }
 }

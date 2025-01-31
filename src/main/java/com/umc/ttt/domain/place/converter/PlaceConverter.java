@@ -27,11 +27,11 @@ public class PlaceConverter {
                 .weekdaysBusiness(place.getWeekdaysBusiness())
                 .sunBusiness(place.getSunBusiness())
                 .phone(place.getPhone())
-                .hasParking(place.isHasParking())
-                .hasCafe(place.isHasCafe())
-                .hasIndiePub(place.isHasIndiePub())
-                .hasBookClub(place.isHasBookClub())
-                .hasSpaceRental(place.isHasSpaceRental())
+                .hasParking(place.getHasParking())
+                .hasCafe(place.getHasCafe())
+                .hasIndiePub(place.getHasIndiePub())
+                .hasBookClub(place.getHasBookClub())
+                .hasSpaceRental(place.getHasSpaceRental())
                 .image(place.getImage())
                 .userRating(getUserRating(place, member))   // 같은 취향 유저들의 평점
                 .totalRating(place.getRating()) // 전체 평점
@@ -72,4 +72,34 @@ public class PlaceConverter {
                 .build();
     }
 
+    public static PlaceResponseDTO.PlaceSuggestListDTO toPlaceSuggestListDTO(List<Place> places, List<Long> scrapedPlaceIds) {
+        List<PlaceResponseDTO.PlacePreviewDTO> placePreviewDTOs = places.stream()
+                .map(place -> toPlacePreviewDTO(place, scrapedPlaceIds.contains(place.getId())))
+                .toList();
+
+        return PlaceResponseDTO.PlaceSuggestListDTO.builder()
+                .places(placePreviewDTOs)
+                .build();
+    }
+
+    public static PlaceResponseDTO.EditorPickPlaceDTO toEditorPickPlaceDTO(Place place, boolean isScraped) {
+        return PlaceResponseDTO.EditorPickPlaceDTO.builder()
+                .placeId(place.getId())
+                .title(place.getTitle())
+                .category(place.getCategory())
+                .image(place.getImage())
+                .curationTitle(place.getCurationTitle())
+                .isScraped(isScraped)
+                .build();
+    }
+
+    public static PlaceResponseDTO.EditorPickPlaceListDTO toEditorPickPlaceListDTO(List<Place> places, List<Long> scrapedPlaceIds) {
+        List<PlaceResponseDTO.EditorPickPlaceDTO> editorPickPlaceDTOS = places.stream()
+                .map(place -> toEditorPickPlaceDTO(place, scrapedPlaceIds.contains(place.getId())))
+                .toList();
+
+        return PlaceResponseDTO.EditorPickPlaceListDTO.builder()
+                .places(editorPickPlaceDTOS)
+                .build();
+    }
 }

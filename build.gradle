@@ -45,8 +45,45 @@ dependencies {
 
 	// Json
 	implementation 'org.json:json:20231013'
+
+
+	//jwt
+	implementation 'com.auth0:java-jwt:4.2.1'
+
+	//oauth2Service
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	//thymeleaf
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+	// selenium
+	// https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
+	implementation group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '4.5.8'
+
+	// https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.27.0'
+
+	// https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager
+	implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '5.9.2'
+
+	// email smtp
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//google api
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'com.google.api-client:google-api-client:1.32.1'
+	implementation 'com.google.oauth-client:google-oauth-client:1.32.1'
+	implementation 'com.google.http-client:google-http-client-jackson2:1.40.1'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

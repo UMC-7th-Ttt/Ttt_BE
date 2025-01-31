@@ -63,4 +63,26 @@ public class PlaceResponseDTO {
         private boolean hasNext;
     }
 
+    @Builder
+    @Getter
+    public static class PlaceSuggestListDTO {
+        private List<PlacePreviewDTO> places;
+    }
+
+    @Builder
+    @Getter
+    public static class EditorPickPlaceDTO {
+        private Long placeId;
+        private String title;
+        private PlaceCategory category;
+        private String image;
+        private String curationTitle;
+        private boolean isScraped;
+    }
+
+    @Builder
+    @Getter
+    public static class EditorPickPlaceListDTO {
+        private List<EditorPickPlaceDTO> places;
+    }
 }

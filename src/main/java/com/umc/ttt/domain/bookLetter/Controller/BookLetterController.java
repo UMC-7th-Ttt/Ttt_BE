@@ -55,7 +55,7 @@ public class BookLetterController {
 
     // 북레터 상세 페이지
     @GetMapping("/{bookLetterId}")
-    @Operation(summary = "북레터 상세 조회(관리자)", description = "특정 북레터의 상세 정보를 조회하는 API입니다.")
+    @Operation(summary = "북레터 상세 조회", description = "특정 북레터의 상세 정보를 조회하는 API입니다.")
     public ApiResponse<BookLetterResponseDTO.BookLetterDTO> getBookLetter(@PathVariable(name = "bookLetterId")Long bookLetterId){
         BookLetter bookLetter = bookLetterCommandService.getBookLetter(bookLetterId);
         return ApiResponse.onSuccess(BookLetterConverter.bookLetterDTO(bookLetter));

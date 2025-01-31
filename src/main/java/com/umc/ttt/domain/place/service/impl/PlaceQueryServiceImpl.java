@@ -5,19 +5,24 @@ import com.umc.ttt.domain.member.entity.enums.Role;
 import com.umc.ttt.domain.place.converter.PlaceConverter;
 import com.umc.ttt.domain.place.dto.PlaceResponseDTO;
 import com.umc.ttt.domain.place.entity.Place;
+import com.umc.ttt.domain.place.entity.enums.PlaceCategory;
 import com.umc.ttt.domain.place.repository.PlaceRepository;
 import com.umc.ttt.domain.place.service.PlaceQueryService;
 import com.umc.ttt.domain.scrap.repository.PlaceScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PlaceQueryServiceImpl implements PlaceQueryService {
 
     private final PlaceRepository placeRepository;
@@ -75,6 +80,61 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
         }
 
         return PlaceConverter.toPlaceListDTO(places, nextCursor, limit, hasNext, scrapedPlaceIds);
+    }
+
+    @Override
+    public PlaceResponseDTO.PlaceListDTO searchPlaceList(String keyword, Long cursor, int limit, Member member) {
+        Pageable pageable = PageRequest.of(0, limit + 1);
+        List<Place> places = placeRepository.findPlacesByKeyword(keyword, cursor, pageable);
+
+        boolean hasNext = places.size() > limit;
+
+        List<Place> paginatedPlaces = hasNext ? places.subList(0, limit) : places;
+        List<Long> scrapedPlaceIds = placeScrapRepository.findScrapedPlaceIdsByMemberAndPlaces(member, paginatedPlaces);
+        Long nextCursor = hasNext ? paginatedPlaces.get(paginatedPlaces.size() - 1).getId() : null;
+
+        return PlaceConverter.toPlaceListDTO(paginatedPlaces, nextCursor, limit, hasNext, scrapedPlaceIds);
+    }
+
+    @Override
+    public PlaceResponseDTO.PlaceSuggestListDTO suggestPlaces(Member member) {
+        // TODO: 멤버가 선호하는 공간 카테고리 가져오기
+        PlaceCategory category = PlaceCategory.CAFE;
+
+        List<Place> places;
+
+        if (category != null) {
+            places = placeRepository.findPlacesByCategory(category);
+        } else {
+            places = placeRepository.findAll();
+        }
+
+        List<Place> randomPlaces = places.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        collected -> {
+                            Collections.shuffle(collected);
+                            return collected.stream().limit(10).toList();
+                        }
+                ));
+        List<Long> scrapedPlaceIds = placeScrapRepository.findScrapedPlaceIdsByMemberAndPlaces(member, randomPlaces);
+
+        return PlaceConverter.toPlaceSuggestListDTO(randomPlaces, scrapedPlaceIds);
+    }
+
+    @Override
+    public PlaceResponseDTO.EditorPickPlaceListDTO getEditorPickPlaces(Member member) {
+        // 에디터 픽 공간 5곳 - 로이 픽
+        List<String> titles = Arrays.asList("북앤드로잉", "유어마인드", "북파크", "땡스북스", "책방오늘");
+
+        List<Place> places = titles.stream()
+                .map(placeRepository::findPlaceByTitle)
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<Long> scrapedPlaceIds = placeScrapRepository.findScrapedPlaceIdsByMemberAndPlaces(member, places);
+
+        return PlaceConverter.toEditorPickPlaceListDTO(places, scrapedPlaceIds);
     }
 
 }
