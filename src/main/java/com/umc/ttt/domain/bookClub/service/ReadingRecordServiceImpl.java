@@ -1,0 +1,37 @@
+package com.umc.ttt.domain.bookClub.service;
+
+import com.umc.ttt.domain.bookClub.converter.ReadingRecordConverter;
+import com.umc.ttt.domain.bookClub.dto.ReadingRecordRequestDTO;
+import com.umc.ttt.domain.bookClub.entity.BookClub;
+import com.umc.ttt.domain.bookClub.entity.BookClubMember;
+import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
+import com.umc.ttt.domain.bookClub.handler.BookClubHandler;
+import com.umc.ttt.domain.bookClub.repository.BookClubMemberRepository;
+import com.umc.ttt.domain.bookClub.repository.BookClubRepository;
+import com.umc.ttt.domain.bookClub.repository.ReadingRecordRepository;
+import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class ReadingRecordServiceImpl implements ReadingRecordService {
+
+    private final ReadingRecordRepository readingRecordRepository;
+    private final BookClubRepository bookClubRepository;
+    private final BookClubMemberRepository bookClubMemberRepository;
+
+    @Override
+    public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, Member member) {
+        BookClub bookClub = bookClubRepository.findById(bookClubId)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
+
+        BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
+
+        ReadingRecord readingRecord = ReadingRecordConverter.toReadingRecord(request, bookClubMember);
+
+        return readingRecordRepository.save(readingRecord);
+    }
+}

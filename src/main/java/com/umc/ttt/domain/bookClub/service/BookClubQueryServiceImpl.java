@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -62,9 +63,11 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         // 사용자 참여 인증 조회
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
-        ReadingRecord readingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
-                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
 
+        List<ReadingRecord> readingRecords = readingRecordRepository.findByBookClubMember(bookClubMember);
+        ReadingRecord readingRecord = readingRecords.stream()
+                .max(Comparator.comparing(ReadingRecord::getCreatedAt)) // 가장 최근 인증 선택
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
 
         // 오늘 날짜 기준 경과 주 계산
         int elapsedWeeks = calculateElapsedWeeks(bookClub.getStartDate(), 4);

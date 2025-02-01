@@ -33,7 +33,7 @@ public class BookCategoryInitializer {
                 CategoryMapping.builder().name("소설").id(1L).build(),
                 CategoryMapping.builder().name("판타지").id(50928L).build(),
                 CategoryMapping.builder().name("미스터리").id(50926L).build(),
-                CategoryMapping.builder().name("고전").id(103639L).build(),
+                CategoryMapping.builder().name("고전").id(2105L).build(),
                 CategoryMapping.builder().name("성장").id(51235L).build(),
                 CategoryMapping.builder().name("심리학").id(51395L).build(),
                 CategoryMapping.builder().name("비즈니스").id(2172L).build(),
