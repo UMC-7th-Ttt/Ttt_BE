@@ -74,6 +74,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 참여 인증
     READING_RECORED_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORED404", "존재하지 않는 참여 인증입니다."),
 
+    // 리뷰 관련
+    INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "RIVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
+
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
 
