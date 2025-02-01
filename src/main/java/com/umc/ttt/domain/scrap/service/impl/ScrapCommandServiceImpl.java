@@ -36,8 +36,6 @@ public class ScrapCommandServiceImpl implements ScrapCommandService {
     private final BookScrapRepository bookScrapRepository;
     private final ScrapFolderRepository scrapFolderRepository;
 
-    // TODO: 회원가입 시 기본 폴더(도서, 공간) 생성하는 로직 추가 필요
-
     @Override
     public ScrapResponseDTO.ScrapFolderDTO createScrapFolder(String folder, Member member) {
         // 폴더가 이미 존재하는지 확인
