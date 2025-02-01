@@ -24,7 +24,7 @@ public class ReviewResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class reviewCalendarListDTO{
-        List<reviewCalendarDTO> reviewList;
+        private List<reviewCalendarDTO> reviewList;
     }
 
     @Builder
@@ -35,6 +35,27 @@ public class ReviewResponseDTO {
         private Long id;
         private String cover;
         private LocalDate writeDate;
+    }
+
+    // 서평 모아보기
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class reviewListDTO{
+        private List<reviewDTO> reviewList;
+        private Long nextCursor;
+        private int limit;
+        private boolean hasNext;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class reviewDTO{
+        private Long id;
+        private String cover;
     }
 
 }

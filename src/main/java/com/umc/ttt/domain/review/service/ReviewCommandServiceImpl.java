@@ -8,6 +8,7 @@ import com.umc.ttt.domain.place.entity.Place;
 import com.umc.ttt.domain.place.repository.PlaceRepository;
 import com.umc.ttt.domain.review.converter.ReviewConverter;
 import com.umc.ttt.domain.review.dto.ReviewRequestDTO;
+import com.umc.ttt.domain.review.dto.ReviewResponseDTO;
 import com.umc.ttt.domain.review.entity.Review;
 import com.umc.ttt.domain.review.handler.ReviewHandler;
 import com.umc.ttt.domain.review.repository.ReviewRepository;
@@ -15,9 +16,14 @@ import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -91,6 +97,17 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     public List<Review> getReviewCalendar(int year, int month, Member member) {
         List<Review> reviewList = reviewRepository.findByMemberAndYearAndMonth(year, month, member);
         return reviewList;
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member) {
+        Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Order.desc("id")));
+        Slice<Review> reviews = reviewRepository.findReviewsWithCursor(member, cursor, pageable);
+
+        Long nextCursor = reviews.hasNext() ? reviews.getContent().get(reviews.getContent().size() - 1).getId() : null;
+
+        return ReviewConverter.reviewListDTO(reviews.getContent(), nextCursor, limit, reviews.hasNext());
     }
 
 }

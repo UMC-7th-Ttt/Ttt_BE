@@ -36,4 +36,14 @@ public class ReviewRestController {
         return ApiResponse.onSuccess(ReviewConverter.reviewCalendarListDTO(reviewList));
     }
 
+    @GetMapping("/")
+    @Operation(summary = "서평 보기- 모아보기",description = "작성한 서평을 모아보는 API입니다.\n\n" +
+            "첫 페이지 조회 시 cursor 값으로 0을 전달해주세요.\n\n" +
+            "첫 페이지가 아닌 경우 이전 응답의 hasNext가 true일 때, nextCursor 값을 cursor로 전달해주세요.")
+    public ApiResponse<ReviewResponseDTO.reviewListDTO> viewReviewList(@RequestParam(name = "cursor", defaultValue = "0") Long cursor,
+                                                                       @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                                                       @CurrentMember Member member) {
+        ReviewResponseDTO.reviewListDTO response = reviewCommandService.getReviewList(cursor, limit, member);
+        return ApiResponse.onSuccess(response);
+    }
 }

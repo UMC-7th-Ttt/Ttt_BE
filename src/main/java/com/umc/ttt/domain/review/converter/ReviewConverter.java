@@ -49,4 +49,24 @@ public class ReviewConverter {
                 .reviewList(reviewCalendarDTOList)
                 .build();
     }
+
+    // 서평 모아보기
+    public static ReviewResponseDTO.reviewDTO reviewDTO(Review review) {
+        return ReviewResponseDTO.reviewDTO.builder()
+                .id(review.getId())
+                .cover(review.getBook().getCover())
+                .build();
+    }
+
+    public static ReviewResponseDTO.reviewListDTO reviewListDTO(List<Review> reviewList, Long nextCursor, int limit, boolean hasNext) {
+        List<ReviewResponseDTO.reviewDTO> reviewDTOList = reviewList.stream()
+                .map(ReviewConverter::reviewDTO).collect(Collectors.toList());
+
+        return ReviewResponseDTO.reviewListDTO.builder()
+                .reviewList(reviewDTOList)
+                .nextCursor(nextCursor)
+                .limit(limit)
+                .hasNext(hasNext)
+                .build();
+    }
 }
