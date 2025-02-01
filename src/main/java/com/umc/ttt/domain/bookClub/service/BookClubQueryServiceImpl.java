@@ -63,7 +63,7 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
         ReadingRecord readingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
-                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORED_NOT_FOUND));
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
 
 
         // 오늘 날짜 기준 경과 주 계산
@@ -74,6 +74,21 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         int recommendedCompletionRate = calculateRecommendedCompletionRate(book.getItemPage(), 4, bookClub.getStartDate());
 
         return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, memberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
+    }
+
+    @Override
+    public BookClubResponseDTO.getBookClubJoinPageResultDTO getBookClubJoinPageDTO(Long bookClubId, Member member) {
+        // BookClub 정보 조회
+        BookClub bookClub = bookClubRepository.findById(bookClubId)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
+
+        // 책 정보 조회
+        Book book = bookRepository.findBookByBookClub(bookClub)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_NOT_FOUND));
+        boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
+        BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO = BookConverter.toGetBookDetailResultDTO(book, isScraped);
+
+        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO);
     }
 
     public int calculateElapsedWeeks(LocalDate startDate, int totalWeeks) {

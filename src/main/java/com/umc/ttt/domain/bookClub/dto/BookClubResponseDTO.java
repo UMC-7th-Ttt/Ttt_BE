@@ -71,4 +71,25 @@ public class BookClubResponseDTO {
         BookResponseDTO.BookInfoDTO bookInfo;
         List<MemberResponseDTO.MemberInfoDTO> members;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getBookClubJoinPageResultDTO {
+        Long bookClubId;
+        LocalDate startDate;
+        LocalDate endDate;
+        Integer recuitNumber;
+        BookResponseDTO.GetBookDetailResultDTO bookInfo;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class joinBookClubResultDTO {
+        Long id;
+        Long bookClubId;
+    }
 }

@@ -1,6 +1,8 @@
 package com.umc.ttt.domain.member.entity;
 
 import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.book.entity.BookFormatCategory;
+import com.umc.ttt.domain.place.entity.enums.PlaceCategory;
 import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
-public class MemberPreferedCategory extends BaseEntity {
+public class MemberPreferredCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +23,12 @@ public class MemberPreferedCategory extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_category_id")
+    @JoinColumn(name = "book_category_id") // bookCategory는 선택이므로 nullable = true
     private BookCategory bookCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_format_id")
+    private BookFormatCategory bookFormatCategory;
 }

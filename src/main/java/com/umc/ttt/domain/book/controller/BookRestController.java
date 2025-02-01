@@ -75,6 +75,15 @@ public class BookRestController {
         return ApiResponse.onSuccess(books);
     }
 
+    @GetMapping("/search/editor-pick")
+    @Operation(summary = "책 에디터 픽 추천 검색어 조회", description = "에디터 픽 추천 검색어 조회 API이며, 책 5권을 반환합니다.")
+    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByEditor() {
+        // TODO: 로그인한 회원 정보로 변경
+        Member member = memberRepository.findById(1L).get();
+        BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksByEditor(member);
+        return ApiResponse.onSuccess(books);
+    }
+
     @GetMapping("/{bookId}")
     @Operation(summary = "책 상세 조회", description = "책 상세 조회 API입니다.")
     public ApiResponse<BookResponseDTO.GetBookDetailResultDTO> getBookDetails(@PathVariable Long bookId) {

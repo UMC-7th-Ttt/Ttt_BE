@@ -21,18 +21,24 @@ public class Review extends BaseEntity {
     @Column(name = "review_id", nullable = false)
     private Long id;
 
-    @Lob
-    @Column(nullable = false)
-    private String content; // 내용
+    @Column(nullable = true)
+    private String title;   // 서평 제목
 
-    @Column(nullable = false)
+    @Lob
+    @Column(nullable = true)
+    private String content; // 서평 내용
+
+    @Column(nullable = true)
     private double bookRanking; // 책 별점
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private double placeRanking;    // 장소 별점
 
     @Column(nullable = false)
     private LocalDate writeDate;    // 작성 날짜
+
+    @Column(nullable = false)
+    private boolean isSecret;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -45,4 +51,23 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
+
+    public void setInfo(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public void setIsSecret(boolean isSecret) {
+        this.isSecret = isSecret;
+    }
+
+    public void setBook(Book book, double bookRanking) {
+        this.book = book;
+        this.bookRanking = bookRanking;
+    }
+
+    public void setPlace(Place place, double placeRanking) {
+        this.place = place;
+        this.placeRanking = placeRanking;
+    }
 }

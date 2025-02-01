@@ -4,6 +4,9 @@ import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,4 +29,20 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reading_record_id")
     private ReadingRecord readingRecord;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;     // 부모 댓글
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies = new ArrayList<>();  // 댓글의 답글
+
+    public void setParent(Comment parent) {
+        this.parent = parent;
+    }
+
+    public void addReplies(Comment reply) {
+        this.replies.add(reply);
+        reply.setParent(this);
+    }
 }

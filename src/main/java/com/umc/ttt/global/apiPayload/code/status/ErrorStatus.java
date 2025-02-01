@@ -28,10 +28,15 @@ public enum ErrorStatus implements BaseErrorCode {
     // 회원
     PERMISSION_DENIED(HttpStatus.FORBIDDEN, "MEMBER403", "권한이 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER401", "사용자가 존재하지 않습니다."),
+    MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER400", "이미 존재하는 사용자입니다."),
+    NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "MEMBER400", "이미 존재하는 닉네임입니다."),
 
     //jwt
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN401", "유효하지 않은 token입니다.."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "LOGIN401", "refreshtoken이 만료되었습니다. 로그인해주세요."),
+
+    //email
+    UNAUTHORIZED_EMAIL(HttpStatus.UNAUTHORIZED, "EMAIL401", "본인 인증에 실패했습니다."),
 
     // 스크랩
     FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "FOLDER404", "스크랩 폴더가 존재하지 않습니다."),
@@ -64,9 +69,18 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 북클럽 멤버
     MEMBER_NOT_FOUND_IN_BOOK_CLUB(HttpStatus.NOT_FOUND,"BOOKCLUB_MEMBER404", "존재하지 않는 북클럽 멤버입니다."),
+    BOOK_CLUB_MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"BOOKCLUB_MEMBER401", "이미 가입한 북클럽입니다."),
 
     // 참여 인증
-    READING_RECORED_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORED404", "존재하지 않는 참여 인증입니다."),
+    READING_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORD404", "존재하지 않는 참여 인증입니다."),
+
+    // 참여 인증 댓글 
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"COMMENT404", "존재하지 않는 댓글입니다."),
+    PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"COMMENT404", "존재하지 않는 부모 댓글입니다."),
+    NOT_AUTHOR_OF_COMMENT(HttpStatus.UNAUTHORIZED,"COMMENT401", "댓글 작성자가 아닙니다."),
+
+    // 리뷰 관련
+    INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "RIVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
 
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
