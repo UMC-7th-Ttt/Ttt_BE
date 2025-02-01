@@ -17,6 +17,9 @@ import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ReadingRecordServiceImpl implements ReadingRecordService {
@@ -36,6 +39,32 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
         ReadingRecord readingRecord = ReadingRecordConverter.toReadingRecord(request, bookClubMember);
 
         return readingRecordRepository.save(readingRecord);
+    }
+
+    @Override
+    public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList() {
+        // 가장 최근에 생성된 인증 10개 조회
+        List<ReadingRecord> readingRecords = readingRecordRepository.findTop10ByOrderByCreatedAtDesc();
+
+        if (readingRecords.isEmpty()) {
+            throw new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND);
+        }
+
+        List<ReadingRecordResponseDTO.ReadingRecordDTO> readingRecordDTOs = readingRecords.stream().map(readingRecord -> {
+            BookClubMember bookClubMember = readingRecord.getBookClubMember();
+            if (bookClubMember == null) {
+                throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB);
+            }
+
+            Member member = bookClubMember.getMember();
+            if (member == null) {
+                throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND);
+            }
+
+            return ReadingRecordConverter.toReadingRecordDTO(readingRecord, member);
+        }).collect(Collectors.toList());
+
+        return new ReadingRecordResponseDTO.GetReadingRecordListResultDTO(readingRecordDTOs);
     }
 
     @Override

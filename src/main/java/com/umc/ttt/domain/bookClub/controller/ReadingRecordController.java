@@ -28,6 +28,13 @@ public class ReadingRecordController {
         return ApiResponse.onSuccess(ReadingRecordConverter.toReadingRecordResultDTO(readingRecord));
     }
 
+    @GetMapping
+    @Operation(summary = "책마다 북클럽 서평 인증 목록 조회", description = "책마다 북클럽 서평 인증 목록 조회 API입니다.")
+    public ApiResponse<ReadingRecordResponseDTO.GetReadingRecordListResultDTO> getReadingRecordList(@CurrentMember Member member) {
+        ReadingRecordResponseDTO.GetReadingRecordListResultDTO readingRecord = readingRecordService.getReadingRecordList();
+        return ApiResponse.onSuccess(readingRecord);
+    }
+
     @GetMapping("/{readingRecordId}")
     @Operation(summary = "책마다 북클럽 서평 인증 상세 조회", description = "책마다 북클럽 서평 인증 상세 조회 API입니다.")
     public ApiResponse<ReadingRecordResponseDTO.GetReadingRecordResultDTO> getReadingRecord(@PathVariable(name = "readingRecordId") Long readingRecordId,

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 public class ReadingRecordResponseDTO {
 
     @Builder
@@ -14,6 +16,24 @@ public class ReadingRecordResponseDTO {
     @AllArgsConstructor
     public static class ReadingRecordResultDTO {
         private Long id;
+    }
+
+    @Builder
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class GetReadingRecordListResultDTO {
+        private List<ReadingRecordDTO> readingRecords;
+    }
+
+    @Builder
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class ReadingRecordDTO {
+        private Long id;
+        private String imgUrl;
+        private String memberNickName;
     }
 
     @Builder

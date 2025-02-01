@@ -5,6 +5,7 @@ import com.umc.ttt.domain.bookClub.dto.ReadingRecordResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
 import com.umc.ttt.domain.member.dto.MemberResponseDTO;
+import com.umc.ttt.domain.member.entity.Member;
 
 public class ReadingRecordConverter {
     public static ReadingRecord toReadingRecord(ReadingRecordRequestDTO.ReadingRecordDTO request, BookClubMember bookClubMember) {
@@ -21,6 +22,14 @@ public class ReadingRecordConverter {
     public static ReadingRecordResponseDTO.ReadingRecordResultDTO toReadingRecordResultDTO(ReadingRecord readingRecord) {
         return ReadingRecordResponseDTO.ReadingRecordResultDTO.builder()
                 .id(readingRecord.getId())
+                .build();
+    }
+
+    public static ReadingRecordResponseDTO.ReadingRecordDTO toReadingRecordDTO(ReadingRecord readingRecord, Member member) {
+        return ReadingRecordResponseDTO.ReadingRecordDTO.builder()
+                .id(readingRecord.getId())
+                .imgUrl(readingRecord.getImgUrl())
+                .memberNickName(member.getNickname())
                 .build();
     }
 

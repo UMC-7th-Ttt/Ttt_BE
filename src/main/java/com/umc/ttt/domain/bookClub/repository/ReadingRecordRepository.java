@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface ReadingRecordRepository extends JpaRepository<ReadingRecord, Long> {
     List<ReadingRecord> findByBookClubMember(BookClubMember bookClubMember);
+
+    List<ReadingRecord> findTop10ByOrderByCreatedAtDesc();
 }
