@@ -34,7 +34,7 @@ public class ScrapConverter {
         List<Map.Entry<String, LocalDateTime>> imagesWithUpdatedAt = new ArrayList<>();
 
         if (!scrapFolder.getName().equals("도서")) {
-            scrapFolder.getPlaceScraps().stream()
+            Optional.ofNullable(scrapFolder.getPlaceScraps()).orElse(Collections.emptyList()).stream()
                     .sorted(Comparator.comparing(PlaceScrap::getUpdatedAt))
                     .limit(4)
                     .forEach(placeScrap -> {
@@ -46,7 +46,7 @@ public class ScrapConverter {
         }
 
         if (!scrapFolder.getName().equals("공간")) {
-            scrapFolder.getBookScraps().stream()
+            Optional.ofNullable(scrapFolder.getBookScraps()).orElse(Collections.emptyList()).stream()
                     .sorted(Comparator.comparing(BookScrap::getUpdatedAt))
                     .limit(4)
                     .forEach(bookScrap -> {
