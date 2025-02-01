@@ -44,6 +44,22 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
+    public BookResponseDTO.GetBestSellersResultDTO getBestSellers(Member member) {
+        List<Book> books = bookRepository.findAll();
+
+        // bestRank가 1~5인 책 필터링
+        List<Book> filteredBooks = books.stream()
+                .filter(book -> book.getBestRank() >= 1 && book.getBestRank() <= 5)
+                .collect(Collectors.toList());
+
+        // 최대 5권을 랜덤으로 선택
+        Collections.shuffle(filteredBooks);
+        List<Book> selectedBooks = filteredBooks.stream().limit(5).collect(Collectors.toList());
+
+        return BookConverter.toGetBestSellersResultDTO(selectedBooks);
+    }
+
+    @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
         // 카테고리 매핑 정의
         Map<String, List<String>> categoryMapping = Map.of(

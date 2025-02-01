@@ -31,7 +31,7 @@ public class Book {
     private String publisher;   // 출판사
 
     @Column(nullable = false)
-    private String bestRank;  // 베스트셀러 순위
+    private int bestRank;  // 베스트셀러 순위
 
     @Column(nullable = false)
     private int itemPage;    // 분량
@@ -52,6 +52,8 @@ public class Book {
     private String toc; // 목차
 
     private String publisherDescription;    // 출판사 제공 책소개
+
+    private String mainSentences;    // 주요 문장
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_category_id")
