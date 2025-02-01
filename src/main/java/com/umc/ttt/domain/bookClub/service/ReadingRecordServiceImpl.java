@@ -2,6 +2,7 @@ package com.umc.ttt.domain.bookClub.service;
 
 import com.umc.ttt.domain.bookClub.converter.ReadingRecordConverter;
 import com.umc.ttt.domain.bookClub.dto.ReadingRecordRequestDTO;
+import com.umc.ttt.domain.bookClub.dto.ReadingRecordResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
@@ -9,6 +10,8 @@ import com.umc.ttt.domain.bookClub.handler.BookClubHandler;
 import com.umc.ttt.domain.bookClub.repository.BookClubMemberRepository;
 import com.umc.ttt.domain.bookClub.repository.BookClubRepository;
 import com.umc.ttt.domain.bookClub.repository.ReadingRecordRepository;
+import com.umc.ttt.domain.member.converter.MemberConverter;
+import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +36,24 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
         ReadingRecord readingRecord = ReadingRecordConverter.toReadingRecord(request, bookClubMember);
 
         return readingRecordRepository.save(readingRecord);
+    }
+
+    @Override
+    public ReadingRecordResponseDTO.GetReadingRecordResultDTO getReadingRecord(Long readingRecordId) {
+        ReadingRecord readingRecord = readingRecordRepository.findById(readingRecordId)
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
+
+        BookClubMember bookClubMember = readingRecord.getBookClubMember();
+        if (bookClubMember == null) {
+            throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB);
+        }
+
+        Member member = bookClubMember.getMember();
+        if (member == null) {
+            throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND);
+        }
+        MemberResponseDTO.MemberInfoDTO memberInfoDTO = MemberConverter.toMemberInfoDTO(member);
+
+        return ReadingRecordConverter.toGetReadingRecordResultDTO(readingRecord, memberInfoDTO);
     }
 }

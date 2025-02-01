@@ -27,4 +27,12 @@ public class ReadingRecordController {
         ReadingRecord readingRecord = readingRecordService.createReadingRecord(bookClubId, readingRecordDTO, member);
         return ApiResponse.onSuccess(ReadingRecordConverter.toReadingRecordResultDTO(readingRecord));
     }
+
+    @GetMapping("/{readingRecordId}")
+    @Operation(summary = "책마다 북클럽 서평 인증 상세 조회", description = "책마다 북클럽 서평 인증 상세 조회 API입니다.")
+    public ApiResponse<ReadingRecordResponseDTO.GetReadingRecordResultDTO> getReadingRecord(@PathVariable(name = "readingRecordId") Long readingRecordId,
+                                                                                            @CurrentMember Member member) {
+        ReadingRecordResponseDTO.GetReadingRecordResultDTO readingRecord = readingRecordService.getReadingRecord(readingRecordId);
+        return ApiResponse.onSuccess(readingRecord);
+    }
 }
