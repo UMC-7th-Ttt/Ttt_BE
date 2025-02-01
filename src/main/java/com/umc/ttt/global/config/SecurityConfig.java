@@ -48,8 +48,8 @@ public class SecurityConfig {
 //    private final String[] permittedUrls = {"/**"}; // TODO 인증 모두 해제
     private final String[] permittedUrls = {"/api/sign-up",
         "/api/login", "/oauth2/authorization/google",
-        "/api/users/code","/api/users/verify-code", "/api/email-duplicated",
-        "/api/google-login","/api/logout", "/api/refresh-token"}; // TODO 추가필요
+        "/api/users/code","/api/users/verify-code", "/api/email-duplicated/**",
+        "/api/google-login","/api/logout", "/api/refresh-token/**", "/api/nickname-duplicated/**","/api/users/keyword/**"}; // TODO 추가필요
 
     private final String[] allowedUrls = Stream.concat(Arrays.stream(swaggerUrls), Arrays.stream(permittedUrls))
             .toArray(String[]::new);

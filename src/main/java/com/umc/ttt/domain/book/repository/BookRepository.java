@@ -34,4 +34,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT b FROM Book b WHERE b.bookCategory.categoryName IN :bookCategoryNames")
     List<Book> findBooksByBookCategoryNames(List<String> bookCategoryNames);
+
+    Optional<Book> findBookById(Long bookId);
 }
