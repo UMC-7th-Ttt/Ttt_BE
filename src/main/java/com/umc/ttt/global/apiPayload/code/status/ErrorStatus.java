@@ -72,7 +72,12 @@ public enum ErrorStatus implements BaseErrorCode {
     BOOK_CLUB_MEMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"BOOKCLUB_MEMBER401", "이미 가입한 북클럽입니다."),
 
     // 참여 인증
-    READING_RECORED_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORED404", "존재하지 않는 참여 인증입니다."),
+    READING_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND,"READING_RECORD404", "존재하지 않는 참여 인증입니다."),
+
+    // 참여 인증 댓글 
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"COMMENT404", "존재하지 않는 댓글입니다."),
+    PARENT_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"COMMENT404", "존재하지 않는 부모 댓글입니다."),
+    NOT_AUTHOR_OF_COMMENT(HttpStatus.UNAUTHORIZED,"COMMENT401", "댓글 작성자가 아닙니다."),
 
     // 리뷰 관련
     INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "RIVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),

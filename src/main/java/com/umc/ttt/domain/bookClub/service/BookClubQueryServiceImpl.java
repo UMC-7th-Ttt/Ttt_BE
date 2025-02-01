@@ -63,7 +63,7 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
         ReadingRecord readingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
-                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORED_NOT_FOUND));
+                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
 
 
         // 오늘 날짜 기준 경과 주 계산
