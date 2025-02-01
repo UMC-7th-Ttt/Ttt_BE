@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewCommandServiceImpl implements ReviewCommandService {
@@ -82,6 +84,13 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         }
 
         return reviewRepository.save(review);
+    }
+
+    @Override
+    @Transactional
+    public List<Review> getReviewCalendar(int year, int month, Member member) {
+        List<Review> reviewList = reviewRepository.findByMemberAndYearAndMonth(year, month, member);
+        return reviewList;
     }
 
 }

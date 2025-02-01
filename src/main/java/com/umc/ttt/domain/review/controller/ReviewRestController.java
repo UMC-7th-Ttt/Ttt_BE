@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
@@ -26,4 +28,12 @@ public class ReviewRestController {
         Review review = reviewCommandService.addReview(request, member);
         return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
     }
+
+    @GetMapping("/calendar")
+    @Operation(summary = "서평 보기-캘린더",description = "캘린더로 작성한 서평을 조회하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.reviewCalendarListDTO> viewCalendarReview(@RequestParam int year, @RequestParam int month, @CurrentMember Member member) {
+        List<Review> reviewList = reviewCommandService.getReviewCalendar(year, month, member);
+        return ApiResponse.onSuccess(ReviewConverter.reviewCalendarListDTO(reviewList));
+    }
+
 }
