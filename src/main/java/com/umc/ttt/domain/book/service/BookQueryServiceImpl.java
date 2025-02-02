@@ -163,8 +163,10 @@ public class BookQueryServiceImpl implements BookQueryService {
                         .average()
                         .orElse(0.0);
 
-        List<Review> allReviews = reviewRepository.findByBookId(bookId);
-        List<BookResponseDTO.ReviewDTO> reviewDTOList =BookConverter.toReviewDTOList(allReviews);
+        List<Review> allReviews = reviewRepository.findByBookId(bookId).stream()
+                .filter(review -> !review.getIsSecret())
+                .toList();
+        List<BookResponseDTO.ReviewDTO> reviewDTOList = BookConverter.toReviewDTOList(allReviews);
 
         boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
 
