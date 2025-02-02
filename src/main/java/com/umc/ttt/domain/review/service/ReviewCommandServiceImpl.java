@@ -95,7 +95,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     // 서평 캘린더 보기
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Review> getReviewCalendar(int year, int month, Member member) {
         List<Review> reviewList = reviewRepository.findByMemberAndYearAndMonth(year, month, member);
         return reviewList;
@@ -103,7 +103,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     // 서평 모아 보기
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member) {
         Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Order.desc("id")));
         Slice<Review> reviews = reviewRepository.findReviewsWithCursor(member, cursor, pageable);
@@ -115,6 +115,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
     // 서평 상세 보기
     @Override
+    @Transactional(readOnly = true)
     public Review getReviewInfo(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
     }
