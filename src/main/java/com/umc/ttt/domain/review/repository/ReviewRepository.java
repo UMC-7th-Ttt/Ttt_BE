@@ -17,7 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 서평 캘린더 보기
     @Query(value = "SELECT r " +
             "FROM Review r " +
-            "WHERE YEAR(r.writeDate) = :year AND MONTH(r.writeDate) = :month AND r.member = :member")
+            "WHERE YEAR(r.writeDate) = :year AND MONTH(r.writeDate) = :month AND r.member = :member AND r.bookRanking <> 0 ")
     List<Review> findByMemberAndYearAndMonth(int year, int month, Member member);
 
     // 서평 모아보기
