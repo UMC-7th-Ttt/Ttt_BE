@@ -58,4 +58,43 @@ public class ReviewResponseDTO {
         private String cover;
     }
 
+    // 서평 상세 보기
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bookDTO{
+        private Long id;
+        private String title;
+        private String author;
+        private String cover;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class placeDTO{
+        private Long id;
+        private String title;
+        private String address;
+        private String image;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class reviewInfoDTO{
+        private Long id;
+        private String title;
+        private String content;
+        private boolean isSecret;
+        private double bookRanking;     // bookRanking이 0이라면 리뷰에 책은 등록하지 않은 것입니다.
+        private double placeRanking;    // placeRanking이 0이라면 리뷰에 장소는 등록하지 않은 것입니다.
+        private LocalDate writeDate;
+        private bookDTO book;
+        private placeDTO place;
+    }
+
 }

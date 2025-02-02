@@ -69,4 +69,78 @@ public class ReviewConverter {
                 .hasNext(hasNext)
                 .build();
     }
+
+    // 서평 상세 보기
+    public static ReviewResponseDTO.bookDTO bookDTO(Book book) {
+        return ReviewResponseDTO.bookDTO.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .cover(book.getCover())
+                .build();
+    }
+
+    public static ReviewResponseDTO.placeDTO placeDTO(Place place) {
+        String address = null;
+        if(place.getAddress() != null) {
+            address = place.getAddress().split(" ")[0];
+        }
+
+        return ReviewResponseDTO.placeDTO.builder()
+                .id(place.getId())
+                .title(place.getTitle())
+                .address(address)
+                .image(place.getImage())
+                .build();
+    }
+
+    public static ReviewResponseDTO.reviewInfoDTO reviewInfoDTO(Review review) {
+        if(review.getBookRanking()==0&&review.getPlaceRanking()==0) {   // 서평에 책, 장소 평점 작성을 안 함.
+            return ReviewResponseDTO.reviewInfoDTO.builder()
+                    .id(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .isSecret(review.getIsSecret())
+                    .bookRanking(review.getBookRanking())
+                    .placeRanking(review.getPlaceRanking())
+                    .writeDate(review.getWriteDate())
+                    .build();
+        }else if(review.getBookRanking()==0){   // 서평에 책 평점 작성을 안 함.
+            return ReviewResponseDTO.reviewInfoDTO.builder()
+                    .id(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .isSecret(review.getIsSecret())
+                    .bookRanking(review.getBookRanking())
+                    .placeRanking(review.getPlaceRanking())
+                    .writeDate(review.getWriteDate())
+                    .place(ReviewConverter.placeDTO(review.getPlace()))
+                    .build();
+        }else if(review.getPlaceRanking()==0){  // 서평에 장소 평점 작성을 안 함.
+            return ReviewResponseDTO.reviewInfoDTO.builder()
+                    .id(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .isSecret(review.getIsSecret())
+                    .bookRanking(review.getBookRanking())
+                    .placeRanking(review.getPlaceRanking())
+                    .writeDate(review.getWriteDate())
+                    .book(ReviewConverter.bookDTO(review.getBook()))
+                    .build();
+        }else{  // 서평에 책, 장소 평점을 작성함.
+            return ReviewResponseDTO.reviewInfoDTO.builder()
+                    .id(review.getId())
+                    .title(review.getTitle())
+                    .content(review.getContent())
+                    .isSecret(review.getIsSecret())
+                    .bookRanking(review.getBookRanking())
+                    .placeRanking(review.getPlaceRanking())
+                    .writeDate(review.getWriteDate())
+                    .book(ReviewConverter.bookDTO(review.getBook()))
+                    .place(ReviewConverter.placeDTO(review.getPlace()))
+                    .build();
+        }
+
+
+    }
 }

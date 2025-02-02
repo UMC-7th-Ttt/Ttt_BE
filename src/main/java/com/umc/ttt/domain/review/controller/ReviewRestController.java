@@ -46,4 +46,11 @@ public class ReviewRestController {
         ReviewResponseDTO.reviewListDTO response = reviewCommandService.getReviewList(cursor, limit, member);
         return ApiResponse.onSuccess(response);
     }
+
+    @GetMapping("/{reviewId}")
+    @Operation(summary = "서평 상세 보기",description = "서평을 상세 조회하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.reviewInfoDTO> viewReviewInfo(@PathVariable Long reviewId) {
+        Review review = reviewCommandService.getReviewInfo(reviewId);
+        return ApiResponse.onSuccess(ReviewConverter.reviewInfoDTO(review));
+    }
 }

@@ -11,4 +11,5 @@ public interface ReviewCommandService {
     Review addReview(ReviewRequestDTO.AddUpdateDto request, Member member);
     List<Review> getReviewCalendar(int year, int month, Member member);
     ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member);
+    Review getReviewInfo(Long reviewId);
 }
