@@ -7,10 +7,12 @@ import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
+import com.umc.ttt.domain.member.repository.MemberRepository;
+import com.umc.ttt.domain.review.entity.Review;
+import com.umc.ttt.domain.review.repository.ReviewRepository;
 import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
-import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,8 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     private final BookRepository bookRepository;
     private final BookScrapRepository bookScrapRepository;
+    private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member) {
@@ -80,15 +84,15 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member) {
-        List<BookCategory> preferedCategories = member.getPreferedCategories().stream()
+        List<BookCategory> preferredCategories = member.getPreferredCategories().stream()
                 .map(MemberPreferredCategory::getBookCategory)
                 .collect(Collectors.toList());
 
-        if (preferedCategories.isEmpty()) {
+        if (preferredCategories.isEmpty()) {
             throw new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND);
         }
 
-        List<Book> books = bookRepository.findBooksByCategories(preferedCategories);
+        List<Book> books = bookRepository.findBooksByCategories(preferredCategories);
 
         // 최대 10권을 랜덤으로 선택
         List<Book> randomBooks = books.stream()
@@ -123,10 +127,47 @@ public class BookQueryServiceImpl implements BookQueryService {
     @Override
     public BookResponseDTO.GetBookDetailResultDTO getBookDetails(long bookId, Member member) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new PlaceHandler(ErrorStatus.BOOK_NOT_FOUND));
+                .orElseThrow(() -> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
+
+        // 같은 취향 유저 찾기
+        List<BookCategory> preferredBookCategories = member.getPreferredCategories().stream()
+                .map(MemberPreferredCategory::getBookCategory)
+                .filter(Objects::nonNull)
+                .toList();
+
+        List<Member> similarMembers = memberRepository.findAll().stream()
+                .filter(otherMember -> {
+                    List<BookCategory> otherPreferredCategories = otherMember.getPreferredCategories().stream()
+                            .map(MemberPreferredCategory::getBookCategory)
+                            .filter(Objects::nonNull)
+                            .toList();
+
+                    // 공통 bookCategory 개수 계산
+                    long matchCount = preferredBookCategories.stream()
+                            .filter(otherPreferredCategories::contains)
+                            .count();
+
+                    return matchCount >= 2; // 2개 이상 겹치는 경우만 포함
+                })
+                .toList();
+
+        // 해당 멤버들이 작성한 리뷰 가져오기
+        List<Review> filteredReviews = reviewRepository.findAll().stream()
+                .filter(review -> similarMembers.contains(review.getMember()))
+                .toList();
+
+        // userRating 계산 (리뷰가 없는 경우 0.0 반환)
+        double userRating = filteredReviews.isEmpty() ? 0.0 :
+                filteredReviews.stream()
+                        .mapToDouble(Review::getBookRanking)
+                        .average()
+                        .orElse(0.0);
+
+        List<Review> allReviews = reviewRepository.findByBookId(bookId);
+        List<BookResponseDTO.ReviewDTO> reviewDTOList =BookConverter.toReviewDTOList(allReviews);
 
         boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
 
-        return BookConverter.toGetBookDetailResultDTO(book, isScraped);
+        return BookConverter.toGetBookDetailPageResultDTO(book, isScraped, userRating, reviewDTOList);
     }
 }
