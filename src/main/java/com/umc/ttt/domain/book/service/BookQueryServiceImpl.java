@@ -80,15 +80,15 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member) {
-        List<BookCategory> preferedCategories = member.getPreferedCategories().stream()
+        List<BookCategory> preferredCategories = member.getPreferredCategories().stream()
                 .map(MemberPreferredCategory::getBookCategory)
                 .collect(Collectors.toList());
 
-        if (preferedCategories.isEmpty()) {
-            throw new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND);
+        if (preferredCategories.isEmpty()) {
+            throw new BookHandler(ErrorStatus.MEMBER_PREFERRED_CATEGORY_NOT_FOUND);
         }
 
-        List<Book> books = bookRepository.findBooksByCategories(preferedCategories);
+        List<Book> books = bookRepository.findBooksByCategories(preferredCategories);
 
         // 최대 10권을 랜덤으로 선택
         List<Book> randomBooks = books.stream()
