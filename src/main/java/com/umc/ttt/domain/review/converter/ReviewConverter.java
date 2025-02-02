@@ -94,7 +94,14 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewResponseDTO.reviewInfoDTO reviewInfoDTO(Review review) {
+    public static ReviewResponseDTO.reviewInfoDTO reviewInfoDTO(Review review, Member member) {
+        boolean isWriter=false;
+
+        // 작성자인지 확인
+        if(review.getMember() == member){
+            isWriter=true;
+        }
+
         if(review.getBookRanking()==0&&review.getPlaceRanking()==0) {   // 서평에 책, 장소 평점 작성을 안 함.
             return ReviewResponseDTO.reviewInfoDTO.builder()
                     .id(review.getId())
@@ -104,6 +111,7 @@ public class ReviewConverter {
                     .bookRanking(review.getBookRanking())
                     .placeRanking(review.getPlaceRanking())
                     .writeDate(review.getWriteDate())
+                    .isWriter(isWriter)
                     .build();
         }else if(review.getBookRanking()==0){   // 서평에 책 평점 작성을 안 함.
             return ReviewResponseDTO.reviewInfoDTO.builder()
@@ -115,6 +123,7 @@ public class ReviewConverter {
                     .placeRanking(review.getPlaceRanking())
                     .writeDate(review.getWriteDate())
                     .place(ReviewConverter.placeDTO(review.getPlace()))
+                    .isWriter(isWriter)
                     .build();
         }else if(review.getPlaceRanking()==0){  // 서평에 장소 평점 작성을 안 함.
             return ReviewResponseDTO.reviewInfoDTO.builder()
@@ -126,6 +135,7 @@ public class ReviewConverter {
                     .placeRanking(review.getPlaceRanking())
                     .writeDate(review.getWriteDate())
                     .book(ReviewConverter.bookDTO(review.getBook()))
+                    .isWriter(isWriter)
                     .build();
         }else{  // 서평에 책, 장소 평점을 작성함.
             return ReviewResponseDTO.reviewInfoDTO.builder()
@@ -138,6 +148,7 @@ public class ReviewConverter {
                     .writeDate(review.getWriteDate())
                     .book(ReviewConverter.bookDTO(review.getBook()))
                     .place(ReviewConverter.placeDTO(review.getPlace()))
+                    .isWriter(isWriter)
                     .build();
         }
 

@@ -95,6 +95,7 @@ public class ReviewResponseDTO {
         private LocalDate writeDate;
         private bookDTO book;
         private placeDTO place;
+        private boolean isWriter;
     }
 
 }

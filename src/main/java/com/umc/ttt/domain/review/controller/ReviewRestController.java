@@ -49,8 +49,8 @@ public class ReviewRestController {
 
     @GetMapping("/{reviewId}")
     @Operation(summary = "서평 상세 보기",description = "서평을 상세 조회하는 API입니다.")
-    public ApiResponse<ReviewResponseDTO.reviewInfoDTO> viewReviewInfo(@PathVariable Long reviewId) {
+    public ApiResponse<ReviewResponseDTO.reviewInfoDTO> viewReviewInfo(@PathVariable Long reviewId, @CurrentMember Member member) {
         Review review = reviewCommandService.getReviewInfo(reviewId);
-        return ApiResponse.onSuccess(ReviewConverter.reviewInfoDTO(review));
+        return ApiResponse.onSuccess(ReviewConverter.reviewInfoDTO(review,member));
     }
 }
