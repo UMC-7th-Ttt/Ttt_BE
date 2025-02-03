@@ -1,7 +1,9 @@
 package com.umc.ttt.domain.place.service.impl;
 
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
 import com.umc.ttt.domain.member.entity.enums.Role;
+import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.domain.place.converter.PlaceConverter;
 import com.umc.ttt.domain.place.dto.PlaceResponseDTO;
 import com.umc.ttt.domain.place.entity.Place;
@@ -27,6 +29,7 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
 
     private final PlaceRepository placeRepository;
     private final PlaceScrapRepository placeScrapRepository;
+    private final MemberPreferredCategoryRepository memberPreferredCategoryRepository;
 
     @Override
     public PlaceResponseDTO.PlaceDTO getPlace(Long placeId, Member member) {
@@ -98,13 +101,27 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
 
     @Override
     public PlaceResponseDTO.PlaceSuggestListDTO suggestPlaces(Member member) {
-        // TODO: 멤버가 선호하는 공간 카테고리 가져오기
-        PlaceCategory category = PlaceCategory.CAFE;
+        List<MemberPreferredCategory> preferredCategories = memberPreferredCategoryRepository.findByMember(member);
+
+        boolean preferBookstore = false;
+        boolean preferCafe = false;
+
+        if (preferredCategories != null && !preferredCategories.isEmpty()) {
+            for (MemberPreferredCategory preferredCategory : preferredCategories) {
+                if (preferredCategory.getBookFormatCategory().getId() == 6) {   // 독립서점
+                    preferBookstore = true;
+                } else if (preferredCategory.getBookFormatCategory().getId() == 7) { // 북카페
+                    preferCafe = true;
+                }
+            }
+        }
 
         List<Place> places;
 
-        if (category != null) {
-            places = placeRepository.findPlacesByCategory(category);
+        if (preferBookstore && !preferCafe) {
+            places = placeRepository.findPlacesByCategory(PlaceCategory.BOOKSTORE);
+        } else if (preferCafe && !preferBookstore) {
+            places = placeRepository.findPlacesByCategory(PlaceCategory.CAFE);
         } else {
             places = placeRepository.findAll();
         }
