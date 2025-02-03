@@ -17,6 +17,7 @@ public class CommentConverter {
                 .content(comment.getContent())
                 .writerId(comment.getBookClubMember().getId())
                 .writerNickname(comment.getBookClubMember().getMember().getNickname())
+                .writerProfileImg(comment.getBookClubMember().getMember().getProfileUrl())
                 .createdAt(comment.getCreatedAt())
                 .isWriter(comment.getBookClubMember().getId().equals(currentMember.getId()))
                 .isLiked(isLiked)
