@@ -10,4 +10,8 @@ public interface CommentService {
     CommentResponseDTO.CommentListDTO getComments(Long readingRecordId, Member member);
 
     void deleteComment(Long readingRecordId, Long commentId, Member member);
+
+    CommentResponseDTO.CommentLikeDTO addLike(Long readingRecordId, Long commentId, Member member);
+
+    void deleteLike(Long readingRecordId, Long commentId, Member member);
 }

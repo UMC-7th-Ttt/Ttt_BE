@@ -22,6 +22,9 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private String content; // 내용
 
+    @Column(nullable = false)
+    private int likeCount = 0;  // 좋아요 수
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_club_member_id")
     private BookClubMember bookClubMember;  // 댓글 작성자
@@ -44,5 +47,15 @@ public class Comment extends BaseEntity {
     public void addReplies(Comment reply) {
         this.replies.add(reply);
         reply.setParent(this);
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }

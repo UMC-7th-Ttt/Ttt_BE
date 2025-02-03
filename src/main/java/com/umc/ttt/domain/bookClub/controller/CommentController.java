@@ -18,7 +18,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    @Operation(summary = "댓글/답글 작성", description = "책마다 북클럽 서평에 댓글 또는 답글을 작성합니다.")
+    @Operation(summary = "댓글/답글 작성", description = "책마다 북클럽 서평에 댓글 또는 답글을 작성합니다.\n\n" +
+            "답글을 작성하는 경우에만 parentCommentId를 전달해주세요.")
     public ApiResponse<CommentResponseDTO.CommentDTO> createComment(@PathVariable(name = "readingRecordId") Long readingRecordId,
                                                                     @RequestBody CommentRequestDTO.CreateCommentDTO createCommentDTO,
                                                                     @CurrentMember Member member) {
@@ -39,5 +40,22 @@ public class CommentController {
                                              @CurrentMember Member member) {
         commentService.deleteComment(readingRecordId, commentId, member);
         return ApiResponse.onSuccess("댓글/답글이 삭제되었습니다.");
+    }
+
+    @PostMapping("/{commentId}/likes")
+    @Operation(summary = "댓글/답글 좋아요 추가")
+    public ApiResponse<CommentResponseDTO.CommentLikeDTO> addLike(@PathVariable(name = "readingRecordId") Long readingRecordId,
+                                                                  @PathVariable(name = "commentId") Long commentId,
+                                                                  @CurrentMember Member member) {
+        return ApiResponse.onSuccess(commentService.addLike(readingRecordId, commentId, member));
+    }
+
+    @DeleteMapping("/{commentId}/likes")
+    @Operation(summary = "댓글/답글 좋아요 취소")
+    public ApiResponse<Void> deleteLike(@PathVariable(name = "readingRecordId") Long readingRecordId,
+                                        @PathVariable(name = "commentId") Long commentId,
+                                        @CurrentMember Member member) {
+        commentService.deleteLike(readingRecordId, commentId, member);
+        return ApiResponse.onSuccess(null);
     }
 }

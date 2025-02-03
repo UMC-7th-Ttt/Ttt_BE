@@ -36,4 +36,14 @@ public class CommentResponseDTO {
         private List<CommentDTO> comments;
         private int commentCount;
     }
+
+    @Builder
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class CommentLikeDTO {
+        private Long likeId;
+        private Long commentId;
+        private Long bookClubMemberId;
+    }
 }
