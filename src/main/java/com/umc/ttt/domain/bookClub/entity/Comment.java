@@ -19,7 +19,7 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content; // 내용
 
     @Column(nullable = false)

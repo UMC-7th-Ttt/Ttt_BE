@@ -24,8 +24,7 @@ public class Review extends BaseEntity {
     @Column(nullable = true)
     private String title;   // 서평 제목
 
-    @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String content; // 서평 내용
 
     @Column(nullable = true)
