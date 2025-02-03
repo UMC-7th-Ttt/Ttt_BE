@@ -80,4 +80,7 @@ public class Place {
         this.curationContent = curationContent;
     }
 
+    public void updateRating(double averageRating) {
+        this.rating = averageRating;
+    }
 }

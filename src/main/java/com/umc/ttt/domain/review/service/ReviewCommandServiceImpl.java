@@ -23,8 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
             Book book=null;
             Place place=null;
             if(request.getBookId()!=null){
-                book = bookRepository.findById(request.getBookId()).orElseThrow(()->new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
+                book = bookRepository.findById(request.getBookId()).orElseThrow(()-> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
             }
 
             if(request.getPlaceId()!=null){
@@ -61,6 +61,40 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
                 throw new ReviewHandler(ErrorStatus.INVALID_REVIEW_RANKING);
             }
             review = ReviewConverter.toReview(request, member, book, place);
+
+            // 공간에 대한 리뷰가 있을 경우, 해당 공간의 평점 계산 후 업데이트
+            if (place != null) {
+                List<Review> placeReviews = reviewRepository.findAllByPlace(place);
+
+                // 평점 평균 계산
+                double averageRating = Stream.concat(
+                                placeReviews.stream().mapToDouble(Review::getPlaceRanking).boxed(), // 기존 리뷰들의 평점
+                                Stream.of(request.getPlaceRanking()) // 현재 리뷰의 평점
+                        )
+                        .mapToDouble(Double::doubleValue)
+                        .average()
+                        .orElse(0.0); // 평점이 없으면 0.0으로 처리
+
+                place.updateRating(averageRating);
+                placeRepository.save(place);
+            }
+
+            // 도서에 대한 리뷰가 있을 경우, 해당 도서의 평점 계산 후 업데이트
+            if (book != null) {
+                List<Review> bookReviews = reviewRepository.findAllByBook(book);
+
+                // 평점 평균 계산
+                double averageBookRating = Stream.concat(
+                                bookReviews.stream().mapToDouble(Review::getBookRanking).boxed(), // 기존 리뷰들의 평점
+                                Stream.of(request.getBookRanking()) // 현재 리뷰의 평점
+                        )
+                        .mapToDouble(Double::doubleValue)
+                        .average()
+                        .orElse(0.0); // 평점이 없으면 0.0으로 처리
+
+                book.updateRating(averageBookRating);
+                bookRepository.save(book);
+            }
         }else{
             // 서평 수정
             // db에 저장된 서평에는 책이 존재하지 않고, 저장하려는 서평에 책이 존재하면 setBook
