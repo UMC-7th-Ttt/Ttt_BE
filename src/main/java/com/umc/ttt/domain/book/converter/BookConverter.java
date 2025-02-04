@@ -4,6 +4,8 @@ import com.umc.ttt.domain.book.dto.BookFetchDTO;
 import com.umc.ttt.domain.book.dto.BookResponseDTO;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.member.converter.MemberConverter;
+import com.umc.ttt.domain.review.entity.Review;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +75,38 @@ public class BookConverter {
                 .description(book.getDescription())
                 .hasEbook(book.getHasEbook())
                 .isScraped(isScraped)
+                .totalRating(book.getRating())
                 .build();
     }
+
+    public static BookResponseDTO.GetBookDetailResultDTO toGetBookDetailPageResultDTO(Book book, boolean isScraped, double userRating, List<BookResponseDTO.ReviewDTO> reviews) {
+        return BookResponseDTO.GetBookDetailResultDTO.builder()
+                .id(book.getId())
+                .cover(book.getCover())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .category(book.getBookCategory().getCategoryName())
+                .publisher(book.getPublisher())
+                .itemPage(book.getItemPage())
+                .description(book.getDescription())
+                .hasEbook(book.getHasEbook())
+                .isScraped(isScraped)
+                .userRating(userRating)
+                .totalRating(book.getRating())
+                .reviews(reviews)
+                .build();
+    }
+
+    public static List<BookResponseDTO.ReviewDTO> toReviewDTOList(List<Review> allReviews) {
+        return allReviews.stream()
+                .map(review -> BookResponseDTO.ReviewDTO.builder()
+                        .id(review.getId())
+                        .content(review.getContent())
+                        .rating(review.getBookRanking())
+                        .createdAt(review.getCreatedAt())
+                        .memberInfo(MemberConverter.toMemberInfoDTO(review.getMember()))
+                        .build())
+                .toList();
+    }
+
 }

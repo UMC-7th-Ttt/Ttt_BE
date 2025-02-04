@@ -81,7 +81,8 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_AUTHOR_OF_COMMENT(HttpStatus.UNAUTHORIZED,"COMMENT401", "댓글 작성자가 아닙니다."),
 
     // 리뷰 관련
-    INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "RIVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
+    INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "REVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404", "서평이 존재하지 않습니다."),
 
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
