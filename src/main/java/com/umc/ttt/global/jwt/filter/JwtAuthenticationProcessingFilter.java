@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.ttt.global.apiPayload.ApiResponse;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.JwtHandler;
+import com.umc.ttt.global.jwt.entity.RefreshToken;
+import com.umc.ttt.global.jwt.repository.RefreshTokenRepository;
 import com.umc.ttt.global.jwt.service.JwtService;
 import com.umc.ttt.global.jwt.util.PasswordUtil;
 
@@ -26,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -51,6 +54,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository tokenRepository;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -83,6 +87,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     if (!jwtService.isTokenValid(accessToken)) {
                         throw new JwtHandler(ErrorStatus.INVALID_TOKEN);
                     }
+                    // ✅ Access Token으로 Refresh Token 조회
+                    Optional<RefreshToken> refreshTokenOpt = tokenRepository.findByAccessToken(accessToken);
+                    if (refreshTokenOpt.isEmpty()) {
+                        throw new JwtHandler(ErrorStatus.INVALID_TOKEN); // RefreshToken 없으면 차단
+                    }
+
                     return accessToken; // 유효한 토큰만 다음 단계로 전달
                 })
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
@@ -111,6 +121,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      */
     public void saveAuthentication(Member myMember) {
         String password = myMember.getPassword();
+
         if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
             password = PasswordUtil.generateRandomPassword();
         }

@@ -19,10 +19,10 @@ public class ReadingRecord extends BaseEntity {
     @Column(nullable = false)
     private String title;  // 제목
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;  // 내용
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String imgUrl;  // 인증 사진
 
     @Column(nullable = false)

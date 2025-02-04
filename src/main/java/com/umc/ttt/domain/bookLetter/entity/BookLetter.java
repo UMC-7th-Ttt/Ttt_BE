@@ -33,11 +33,10 @@ public class BookLetter extends BaseEntity {
     @Column(nullable = false)
     private String editor;  // 에디터
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content; // 내용
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String coverImg;    // 대표 이미지
 
     @ManyToOne(fetch = FetchType.LAZY)

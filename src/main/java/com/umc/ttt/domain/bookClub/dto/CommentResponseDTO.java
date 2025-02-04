@@ -19,6 +19,7 @@ public class CommentResponseDTO {
         private String content;
         private Long writerId;
         private String writerNickname;
+        private String writerProfileImg;
         private LocalDateTime createdAt;
         private boolean isWriter;
         private boolean isLiked;   // 좋아요 여부
@@ -35,5 +36,15 @@ public class CommentResponseDTO {
     public static class CommentListDTO {
         private List<CommentDTO> comments;
         private int commentCount;
+    }
+
+    @Builder
+    @Getter
+    @RequiredArgsConstructor
+    @AllArgsConstructor
+    public static class CommentLikeDTO {
+        private Long likeId;
+        private Long commentId;
+        private Long bookClubMemberId;
     }
 }

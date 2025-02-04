@@ -7,7 +7,9 @@ import com.umc.ttt.domain.book.repository.BookCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookFormatCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.dto.MemberKeywordDTO;
+import com.umc.ttt.domain.member.dto.MemberProfileDTO;
 import com.umc.ttt.domain.member.dto.MemberSignUpDTO;
+import com.umc.ttt.domain.member.dto.MemberUpdateInfoDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
 import com.umc.ttt.domain.member.entity.enums.ProviderType;
@@ -62,15 +64,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             }
         }
 
-        if (memberRepository.findByNickname(memberSignUpDto.getNickname()).isPresent()) {
-            throw new Exception("이미 존재하는 닉네임입니다.");
-        }
+//        if (memberRepository.findByNickname(memberSignUpDto.getNickname()).isPresent()) {
+//            throw new Exception("이미 존재하는 닉네임입니다.");
+//        }
 
         Member member = Member.builder()
                 .email(memberSignUpDto.getEmail())
                 .password(memberSignUpDto.getPassword())
-                .nickname(memberSignUpDto.getNickname())
-                .profileUrl(memberSignUpDto.getProfileUrl())
+//                .nickname(memberSignUpDto.getNickname())
+//                .profileUrl(memberSignUpDto.getProfileUrl())
                 .providerType(ProviderType.EMAIL)
                 .role(Role.GUEST)
                 .build();
@@ -231,5 +233,59 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Member saveProfile(Long memberId, MemberProfileDTO memberProfileDTO) throws Exception {
+        // 회원 정보 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        // 닉네임이 제공된 경우 업데이트
+        if (memberProfileDTO.getNickname() != null) {
+            member.setNickname(memberProfileDTO.getNickname());
+        }
+
+        // 프로필 URL이 제공된 경우 업데이트
+        if (memberProfileDTO.getProfileUrl() != null) {
+            member.setProfileUrl(memberProfileDTO.getProfileUrl());
+        }
+
+        member.setRole(Role.USER);
+        // 변경된 회원 정보 저장
+        memberRepository.save(member);
+
+        return member;
+    }
+
+    @Override
+    public Member updateInfo(Member member, MemberUpdateInfoDTO memberUpdateInfoDTO) throws Exception {
+        // 닉네임이 제공된 경우 업데이트
+        if (memberUpdateInfoDTO.getNickname() != null) {
+            member.setNickname(memberUpdateInfoDTO.getNickname());
+        }
+
+        // 프로필 URL이 제공된 경우 업데이트
+        if (memberUpdateInfoDTO.getProfileUrl() != null) {
+            member.setProfileUrl(memberUpdateInfoDTO.getProfileUrl());
+        }
+
+        if (memberUpdateInfoDTO.getPassword() != null){
+            member.setPassword(memberUpdateInfoDTO.getPassword());
+            member.passwordEncode(passwordEncoder);
+        }
+        // 변경된 회원 정보 저장
+        memberRepository.save(member);
+
+        return member;
+    }
+
+    @Override
+    public void validatePassword(Member member, String password) throws Exception {
+        // 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new MemberHandler(ErrorStatus._UNAUTHORIZED);
+        }
+    }
+
 }
 

@@ -1,6 +1,8 @@
 package com.umc.ttt.domain.review.repository;
 
+import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.place.entity.Place;
 import com.umc.ttt.domain.review.entity.Review;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY r.id DESC")
     Slice<Review> findReviewsWithCursor(@Param("member") Member member, @Param("cursor") Long cursor,
                                         Pageable pageable);
+
+    List<Review> findAllByPlace(Place place);
+
+    List<Review> findAllByBook(Book book);
 
     List<Review> findByBookId(Long bookId);
 }
