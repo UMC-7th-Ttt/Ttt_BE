@@ -89,7 +89,7 @@ public class BookQueryServiceImpl implements BookQueryService {
                 .collect(Collectors.toList());
 
         if (preferredCategories.isEmpty()) {
-            throw new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND);
+            throw new BookHandler(ErrorStatus.MEMBER_PREFERRED_CATEGORY_NOT_FOUND);
         }
 
         List<Book> books = bookRepository.findBooksByCategories(preferredCategories);
