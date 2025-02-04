@@ -27,4 +27,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "ORDER BY r.id DESC")
     Slice<Review> findReviewsWithCursor(@Param("member") Member member, @Param("cursor") Long cursor,
                                         Pageable pageable);
+
+    List<Review> findByBookId(Long bookId);
 }
