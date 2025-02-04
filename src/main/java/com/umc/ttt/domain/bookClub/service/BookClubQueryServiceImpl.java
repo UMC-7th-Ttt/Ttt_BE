@@ -87,13 +87,16 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         BookClub bookClub = bookClubRepository.findById(bookClubId)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
 
+        // BookClub 모집 현황 조회
+        Long numberOfMember = bookClubMemberRepository.countByBookClubId(bookClubId);
+
         // 책 정보 조회
         Book book = bookRepository.findBookByBookClub(bookClub)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_NOT_FOUND));
         boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
         BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO = BookConverter.toGetBookDetailResultDTO(book, isScraped);
 
-        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO);
+        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO, numberOfMember);
     }
 
     public int calculateElapsedWeeks(LocalDate startDate, int totalWeeks) {

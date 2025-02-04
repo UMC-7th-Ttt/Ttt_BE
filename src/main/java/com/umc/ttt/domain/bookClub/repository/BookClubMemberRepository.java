@@ -14,4 +14,6 @@ public interface BookClubMemberRepository extends JpaRepository<BookClubMember, 
     List<BookClubMember> findByBookClub(BookClub bookClub);
 
     boolean existsByBookClubAndMember(BookClub bookClub, Member member);
+
+    Long countByBookClubId(Long bookClubId);
 }
