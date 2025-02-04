@@ -56,7 +56,7 @@ public class BookClubResponseDTO {
         LocalDate startDate;
         LocalDate endDate;
         String comment;
-        Integer recuitNumber;
+        Long number0fMember; // 모집 현황
     }
 
     @Builder
@@ -80,7 +80,7 @@ public class BookClubResponseDTO {
         Long bookClubId;
         LocalDate startDate;
         LocalDate endDate;
-        Integer recuitNumber;
+        Long recuitNumber;
         BookResponseDTO.GetBookDetailResultDTO bookInfo;
     }
 

@@ -83,6 +83,12 @@ public class BookClubServiceImpl implements BookClubService{
         return bookClub;
     }
 
+    // 북클럽 현황 가져오기
+    @Override
+    public Long getNumberOfMembers(Long bookClubId) {
+        return bookClubMemberRepository.countByBookClubId(bookClubId);
+    }
+
     @Override
     @Transactional
     public BookClubMember joinBookClub(Long bookClubId, Member member) {

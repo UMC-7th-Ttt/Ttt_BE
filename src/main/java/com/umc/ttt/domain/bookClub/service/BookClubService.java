@@ -12,5 +12,6 @@ public interface BookClubService {
     public void deleteBookClub(Long bookClubId);
     public Page<BookClub> getBookClubPreViewListForManager(Integer page);
     public BookClub getBookClubForManager(Long bookClubId);
+    public Long getNumberOfMembers(Long bookClubId);
     public BookClubMember joinBookClub(Long bookClubId, Member member);
 }
