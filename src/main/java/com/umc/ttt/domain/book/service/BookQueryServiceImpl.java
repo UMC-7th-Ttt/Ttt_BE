@@ -39,6 +39,10 @@ public class BookQueryServiceImpl implements BookQueryService {
             throw new BookHandler(ErrorStatus.PAGE_NOT_FOUND);
         }
 
+        if (books.isEmpty()) {
+            return BookConverter.toSearchBooksResultDTO(Collections.emptyList(), -1, limit, false, Collections.emptyList());
+        }
+
         long nextCursor = books.isEmpty() ? null : books.get(books.size() - 1).getId();
         boolean hasNext = books.size() > limit;
         List<Book> paginatedBooks = hasNext ? books.subList(0, limit) : books;
