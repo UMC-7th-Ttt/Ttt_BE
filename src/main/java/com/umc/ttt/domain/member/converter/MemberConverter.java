@@ -22,6 +22,15 @@ public class MemberConverter {
                 .build();
     }
 
+    public static MemberResponseDTO.MemberProfileDTO toMemberProfileDTO(Member member) {
+        return MemberResponseDTO.MemberProfileDTO.builder()
+                .createdAt(member.getCreatedAt())
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .profileUrl(member.getProfileUrl())
+                .build();
+    }
+
     public static TokenResponseDTO.UpdateResultDTO updateResultDTO(String token) {
         return TokenResponseDTO.UpdateResultDTO.builder()
                 .accessToken(token)

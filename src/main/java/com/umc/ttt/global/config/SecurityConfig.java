@@ -5,6 +5,7 @@ import com.umc.ttt.domain.member.entity.enums.Role;
 import com.umc.ttt.domain.member.repository.MemberRepository;
 import com.umc.ttt.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.umc.ttt.global.jwt.filter.JwtExceptionFilter;
+import com.umc.ttt.global.jwt.repository.RefreshTokenRepository;
 import com.umc.ttt.global.jwt.service.JwtService;
 import com.umc.ttt.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import com.umc.ttt.global.login.handler.LoginFailureHandler;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final LoginService loginService;
     private final JwtService jwtService;
     private final MemberRepository userRepository;
+    private final RefreshTokenRepository tokenRepository;
     private final ObjectMapper objectMapper;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
@@ -49,7 +51,7 @@ public class SecurityConfig {
     private final String[] permittedUrls = {"/api/sign-up",
         "/api/login", "/oauth2/authorization/google",
         "/api/users/code","/api/users/verify-code", "/api/email-duplicated/**",
-        "/api/google-login","/api/logout", "/api/refresh-token/**", "/api/nickname-duplicated/**","/api/users/keyword/**"}; // TODO 추가필요
+        "/api/google-login","/api/logout", "/api/refresh-token/**", "/api/nickname-duplicated/**","/api/users/keyword/**","api/users/{memberId}"}; // TODO 추가필요
 
     private final String[] allowedUrls = Stream.concat(Arrays.stream(swaggerUrls), Arrays.stream(permittedUrls))
             .toArray(String[]::new);
@@ -156,7 +158,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository,tokenRepository);
         return jwtAuthenticationFilter;
     }
 
