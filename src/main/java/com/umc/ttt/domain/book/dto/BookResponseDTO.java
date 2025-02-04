@@ -1,7 +1,9 @@
 package com.umc.ttt.domain.book.dto;
 
+import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class BookResponseDTO {
@@ -54,5 +56,20 @@ public class BookResponseDTO {
         private String description;
         private boolean hasEbook;
         private boolean isScraped;
+        private double userRating;
+        private double totalRating;
+        private List<ReviewDTO> reviews;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewDTO {
+        private Long id;
+        private String content;
+        private double rating;
+        private LocalDateTime createdAt;
+        private MemberResponseDTO.MemberInfoDTO memberInfo;
     }
 }

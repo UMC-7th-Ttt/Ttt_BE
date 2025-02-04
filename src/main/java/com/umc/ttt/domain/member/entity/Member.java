@@ -66,6 +66,6 @@ public class Member extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<MemberPreferredCategory> preferedCategories;
+    private List<MemberPreferredCategory> preferredCategories;
 
 }
