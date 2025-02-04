@@ -17,7 +17,7 @@ public class PlaceConverter {
                 .build();
     }
 
-    public static PlaceResponseDTO.PlaceDTO toPlaceDTO(Place place, Member member, boolean isScraped, boolean isAdmin) {
+    public static PlaceResponseDTO.PlaceDTO toPlaceDTO(Place place, boolean isScraped, boolean isAdmin) {
         return PlaceResponseDTO.PlaceDTO.builder()
                 .placeId(place.getId())
                 .title(place.getTitle())
@@ -33,18 +33,12 @@ public class PlaceConverter {
                 .hasBookClub(place.getHasBookClub())
                 .hasSpaceRental(place.getHasSpaceRental())
                 .image(place.getImage())
-                .userRating(getUserRating(place, member))   // 같은 취향 유저들의 평점
                 .totalRating(place.getRating()) // 전체 평점
                 .curationTitle(place.getCurationTitle())
                 .curationContent(place.getCurationContent())
                 .isScraped(isScraped)
                 .isAdmin(isAdmin)
                 .build();
-    }
-
-    private static Double getUserRating(Place place, Member member) {
-        // TODO: 사용자 평점 계산 로직 - 추후 구현
-        return null;
     }
 
     public static PlaceResponseDTO.PlacePreviewDTO toPlacePreviewDTO(Place place, boolean isScraped) {

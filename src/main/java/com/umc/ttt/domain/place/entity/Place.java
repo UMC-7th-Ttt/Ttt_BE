@@ -63,7 +63,7 @@ public class Place {
     @Column(columnDefinition = "TEXT")
     private String image;   // 장소 이미지
 
-    private Double rating;  // 장소 전체 평균 평점(계산)
+    private double rating = 0.0;  // 장소 전체 평균 평점(계산)
 
     // 큐레이션
     private String curationTitle;    // 제목
@@ -80,4 +80,7 @@ public class Place {
         this.curationContent = curationContent;
     }
 
+    public void updateRating(double averageRating) {
+        this.rating = averageRating;
+    }
 }

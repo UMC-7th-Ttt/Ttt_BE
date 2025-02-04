@@ -186,6 +186,7 @@ public class PlaceApiServiceImpl implements PlaceApiService {
                                 .hasIndiePub(features.get("hasIndiePub"))
                                 .hasBookClub(features.get("hasBookClub"))
                                 .hasSpaceRental(features.get("hasSpaceRental"))
+                                .rating(0.0)
                                 .build();
 
                         placeRepository.save(place);

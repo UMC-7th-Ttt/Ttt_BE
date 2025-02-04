@@ -56,4 +56,8 @@ public class Book {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_category_id")
     private BookCategory bookCategory;
+
+    public void updateRating(double averageBookRating) {
+        this.rating = averageBookRating;
+    }
 }
