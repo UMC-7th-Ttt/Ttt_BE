@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,16 +65,17 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
 
-        List<ReadingRecord> readingRecords = readingRecordRepository.findByBookClubMember(bookClubMember);
-        ReadingRecord readingRecord = readingRecords.stream()
-                .max(Comparator.comparing(ReadingRecord::getCreatedAt)) // 가장 최근 인증 선택
-                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
+        Optional<ReadingRecord> latestReadingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
+                .stream()
+                .max(Comparator.comparing(ReadingRecord::getCreatedAt));
 
         // 오늘 날짜 기준 경과 주 계산
         int elapsedWeeks = calculateElapsedWeeks(bookClub.getStartDate(), 4);
 
         // 완독률 계산
-        int myCompletionRate = calculateUserCompletionRate(readingRecord.getCurrentPage(), book.getItemPage());
+        int myCompletionRate = latestReadingRecord
+                .map(record -> calculateUserCompletionRate(record.getCurrentPage(), book.getItemPage()))
+                .orElse(0);
         int recommendedCompletionRate = calculateRecommendedCompletionRate(book.getItemPage(), 4, bookClub.getStartDate());
 
         return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, memberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
