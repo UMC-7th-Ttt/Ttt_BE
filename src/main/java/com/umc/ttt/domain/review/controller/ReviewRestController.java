@@ -23,7 +23,7 @@ public class ReviewRestController {
     private final ReviewCommandService reviewCommandService;
 
     @PutMapping("/")
-    @Operation(summary = "서평 작성 및 수정",description = "작성한 서평을 저장 및 수정하는 API입니다.")
+    @Operation(summary = "서평 작성",description = "작성한 서평을 저장하는 API입니다.")
     public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> add(@RequestBody @Valid ReviewRequestDTO.AddUpdateDto request, @CurrentMember Member member) {
         Review review = reviewCommandService.addReview(request, member);
         return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
