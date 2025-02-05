@@ -5,6 +5,7 @@ import com.umc.ttt.domain.book.service.BookCommandService;
 import com.umc.ttt.domain.book.service.BookQueryService;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.repository.MemberRepository;
+import com.umc.ttt.global.annotation.CurrentMember;
 import com.umc.ttt.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,9 +47,8 @@ public class BookRestController {
     })
     public ApiResponse<BookResponseDTO.SearchBookResultDTO> searchBooks(@RequestParam(value = "keyword", required = true) String keyword,
                                                                         @RequestParam(value = "cursor", required = false, defaultValue = "0") long cursor,
-                                                                        @RequestParam(value = "limit", required = false, defaultValue = "10") int limit) {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+                                                                        @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                                                        @CurrentMember Member member) {
         BookResponseDTO.SearchBookResultDTO books = bookQueryService.searchBooks(keyword, cursor, limit, member);
         return ApiResponse.onSuccess(books);
     }
@@ -68,36 +68,30 @@ public class BookRestController {
     @Parameters({
             @Parameter(name = "categoryName", description = "카테고리 이름")
     })
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByBookCategory(@RequestParam(value = "categoryName", required = true) String categoryName) {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByBookCategory(@RequestParam(value = "categoryName", required = true) String categoryName,
+                                                                                         @CurrentMember Member member) {
         BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksByBookCategory(categoryName, member);
         return ApiResponse.onSuccess(books);
     }
 
     @GetMapping("/search/user-suggestions")
     @Operation(summary = "책 사용자별 추천 검색어 조회", description = "책 사용자별 추천 검색어 조회 API이며, 사용자의 취향 키워드를 기반으로 추천됩니다.")
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksForUser() {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksForUser(@CurrentMember Member member) {
         BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksForUser(member);
         return ApiResponse.onSuccess(books);
     }
 
     @GetMapping("/search/editor-pick")
     @Operation(summary = "책 에디터 픽 추천 검색어 조회", description = "에디터 픽 추천 검색어 조회 API이며, 책 5권을 반환합니다.")
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByEditor() {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByEditor(@CurrentMember Member member) {
         BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksByEditor(member);
         return ApiResponse.onSuccess(books);
     }
 
     @GetMapping("/{bookId}")
     @Operation(summary = "책 상세 조회", description = "책 상세 조회 API입니다.")
-    public ApiResponse<BookResponseDTO.GetBookDetailResultDTO> getBookDetails(@PathVariable Long bookId) {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+    public ApiResponse<BookResponseDTO.GetBookDetailResultDTO> getBookDetails(@PathVariable Long bookId,
+                                                                              @CurrentMember Member member) {
         BookResponseDTO.GetBookDetailResultDTO bookDetail = bookQueryService.getBookDetails(bookId, member);
         return ApiResponse.onSuccess(bookDetail);
     }

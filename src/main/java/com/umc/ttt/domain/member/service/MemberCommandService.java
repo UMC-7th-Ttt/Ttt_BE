@@ -1,7 +1,9 @@
 package com.umc.ttt.domain.member.service;
 
 import com.umc.ttt.domain.member.dto.MemberKeywordDTO;
+import com.umc.ttt.domain.member.dto.MemberProfileDTO;
 import com.umc.ttt.domain.member.dto.MemberSignUpDTO;
+import com.umc.ttt.domain.member.dto.MemberUpdateInfoDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -25,4 +27,10 @@ public interface MemberCommandService {
     void saveFormatKeyword(Long memberId, List<String> keywords) throws Exception;
 
     List<String> extractTopCategories(List<String> categories) throws Exception;
+
+    Member saveProfile(Long memberId, MemberProfileDTO memberProfileDTO) throws Exception;
+
+    Member updateInfo(Member member, MemberUpdateInfoDTO memberUpdateInfoDTO) throws Exception;
+
+    void validatePassword(Member member, String password) throws Exception;
 }

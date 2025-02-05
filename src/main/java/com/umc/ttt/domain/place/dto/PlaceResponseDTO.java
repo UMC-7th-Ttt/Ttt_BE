@@ -34,8 +34,7 @@ public class PlaceResponseDTO {
         private boolean hasBookClub;
         private boolean hasSpaceRental;
         private String image;
-        private Double userRating;  // 같은 취향 유저들의 평점
-        private Double totalRating;  // 전체 평점
+        private double totalRating;  // 전체 평점
         private String curationTitle;
         private String curationContent;
         private boolean isScraped;
@@ -50,13 +49,15 @@ public class PlaceResponseDTO {
         private PlaceCategory category;
         private String address;
         private String image;
-        private Double totalRating;
+        private double totalRating;
         private boolean isScraped;
     }
 
     @Builder
     @Getter
     public static class PlaceListDTO {
+        private String currentPlace;
+        private String profileImg;
         private List<PlacePreviewDTO> places;
         private Long cursor;
         private int limit;

@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
+@Setter
 public class Member extends BaseEntity {
 
     @Id
@@ -29,11 +30,12 @@ public class Member extends BaseEntity {
 
     private String nickname;    // 닉네임
 
+    @Column(columnDefinition = "TEXT")
     private String profileUrl;  // 프로필 이미지
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;  // 역할(USER, ADMIN)
+    private Role role;  // 역할(GUEST, USER, ADMIN)
 
     @Enumerated(EnumType.STRING)
     private ProviderType providerType;  // 로그인 타입(EMAIL, GOOGLE)
@@ -66,6 +68,6 @@ public class Member extends BaseEntity {
     }
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<MemberPreferredCategory> preferedCategories;
+    private List<MemberPreferredCategory> preferredCategories;
 
 }

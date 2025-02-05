@@ -21,9 +21,5 @@ public class BookClubRequestDTO {
 
         @NotNull(message = "추천 멘트는 필수입니다.")
         String comment;
-
-        @NotNull(message="모집 인원 수는 필수입니다")
-        @Min(value = 1, message = "모집 인원은 1명 이상입니다.")
-        Integer recruitNumber;
     }
 }

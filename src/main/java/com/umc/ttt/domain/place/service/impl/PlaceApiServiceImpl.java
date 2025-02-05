@@ -103,6 +103,8 @@ public class PlaceApiServiceImpl implements PlaceApiService {
         BufferedReader rd;
         int responseCode = conn.getResponseCode();
 
+        System.out.println("Response code: " + conn.getResponseCode());
+
         if (responseCode == 401) {
             throw new PlaceHandler(ErrorStatus.INVALID_SERVICE_KEY);
         }
@@ -163,7 +165,7 @@ public class PlaceApiServiceImpl implements PlaceApiService {
 
                         // description 파싱
                         String description = item.optString("DESCRIPTION", null);
-                        Map<String, String> businessHours = parseDescription(description);
+                        Map<String, String> businessHours = parseDescription(description, placeCategory);
 
                         // subDescription 파싱
                         String subDescription = item.optString("SUB_DESCRIPTION", null);
@@ -186,6 +188,7 @@ public class PlaceApiServiceImpl implements PlaceApiService {
                                 .hasIndiePub(features.get("hasIndiePub"))
                                 .hasBookClub(features.get("hasBookClub"))
                                 .hasSpaceRental(features.get("hasSpaceRental"))
+                                .rating(0.0)
                                 .build();
 
                         placeRepository.save(place);
@@ -204,7 +207,7 @@ public class PlaceApiServiceImpl implements PlaceApiService {
     }
 
     // description 파싱
-    private Map<String, String> parseDescription(String description) {
+    private Map<String, String> parseDescription(String description, PlaceCategory placeCategory) {
         Map<String, String> businessHours = new HashMap<>();
 
         businessHours.put("weekdaysBusiness", null);
@@ -216,16 +219,30 @@ public class PlaceApiServiceImpl implements PlaceApiService {
             return businessHours;
         }
 
-        String weekdaysPattern = "평일개점마감시간\\s*:\\s*(\\d{2}:\\d{2})~(\\d{2}:\\d{2})";
         String satPattern = "토요일개점마감시간\\s*:\\s*(\\d{2}:\\d{2})~(\\d{2}:\\d{2})";
         String sunPattern = "일요일개점마감시간\\s*:\\s*(\\d{2}:\\d{2})~(\\d{2}:\\d{2})";
         String holidayPattern = "휴무일\\s*[:：]\\s*(.*)"; // '휴무일: ' 이후의 모든 텍스트
 
+
         // 평일 시간 추출
-        Pattern weekdayPattern = Pattern.compile(weekdaysPattern);
-        Matcher weekdayMatcher = weekdayPattern.matcher(description);
-        if (weekdayMatcher.find()) {
-            businessHours.put("weekdaysBusiness", weekdayMatcher.group(1) + " - " + weekdayMatcher.group(2));
+        switch (placeCategory) {
+            case BOOKSTORE:
+                String weekdaysPatternBookstore = "평일개점마감시간\\s*:\\s*(\\d{2}:\\d{2})~(\\d{2}:\\d{2})";
+                Pattern weekdayPatternBookstore = Pattern.compile(weekdaysPatternBookstore);
+                Matcher weekdayMatcherBookstore = weekdayPatternBookstore.matcher(description);
+                if (weekdayMatcherBookstore.find()) {
+                    businessHours.put("weekdaysBusiness", weekdayMatcherBookstore.group(1) + " - " + weekdayMatcherBookstore.group(2));
+                }
+                break;
+
+            case CAFE:
+                String weekdaysPatternCafe = "평일개점마감시간\\s*:\\s*(\\d{2}:\\d{2})";  // 시작 시간만 추출
+                Pattern weekdayPatternCafe = Pattern.compile(weekdaysPatternCafe);
+                Matcher weekdayMatcherCafe = weekdayPatternCafe.matcher(description);
+                if (weekdayMatcherCafe.find()) {
+                    businessHours.put("weekdaysBusiness", weekdayMatcherCafe.group(1));
+                }
+                break;
         }
 
         // 토요일 시간 추출

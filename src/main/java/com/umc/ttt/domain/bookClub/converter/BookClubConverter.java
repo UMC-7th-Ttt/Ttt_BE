@@ -26,7 +26,6 @@ public class BookClubConverter {
                 .endDate(request.getEndDate())
                 .comment(request.getComment())
                 .bookLetterBook(bookLetterBook)
-                .recruitNumber(request.getRecruitNumber())
                 .build();
     }
 
@@ -53,7 +52,7 @@ public class BookClubConverter {
     }
 
     // 북레터 상세 보기(관리자)
-    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub) {
+    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub, Long numberOfBMember) {
         return BookClubResponseDTO.BookClubDTOForManager.builder()
                 .bookLetterId(bookClub.getBookLetterBook().getBookLetter().getId())
                 .bookId(bookClub.getBookLetterBook().getBook().getId())
@@ -62,7 +61,7 @@ public class BookClubConverter {
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
                 .comment(bookClub.getComment())
-                .recuitNumber(bookClub.getRecruitNumber())
+                .number0fMember(numberOfBMember)
                 .build();
     }
 
@@ -79,12 +78,12 @@ public class BookClubConverter {
                 .build();
     }
 
-    public static BookClubResponseDTO.getBookClubJoinPageResultDTO toGetBookClubJoinPageResultDTO(BookClub bookClub, BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO) {
+    public static BookClubResponseDTO.getBookClubJoinPageResultDTO toGetBookClubJoinPageResultDTO(BookClub bookClub, BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO, Long numberOfMember) {
         return BookClubResponseDTO.getBookClubJoinPageResultDTO.builder()
                 .bookClubId(bookClub.getId())
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
-                .recuitNumber(bookClub.getRecruitNumber())
+                .recuitNumber(numberOfMember)
                 .bookInfo(getBookDetailResultDTO)
                 .build();
     }

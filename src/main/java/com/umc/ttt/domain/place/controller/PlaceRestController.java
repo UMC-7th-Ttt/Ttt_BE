@@ -65,7 +65,8 @@ public class PlaceRestController {
     @GetMapping
     @Operation(summary = "공간 목록 조회 - 가까운순, 추천순", description = "무한 스크롤 방식으로 공간 목록을 조회합니다.\n\n" +
             "첫 페이지 조회 시 cursor 값으로 0을 전달해주세요.\n\n" +
-            "첫 페이지가 아닌 경우 이전 응답의 hasNext가 true일 때, nextCursor 값을 cursor로 전달해주세요.")
+            "첫 페이지가 아닌 경우 이전 응답의 hasNext가 true일 때, nextCursor 값을 cursor로 전달해주세요.\n\n" +
+            "입력한 좌표가 유효한 주소가 아닌 좌표(ex. 바다 한가운데)일 경우 currentPlace가 null로 반환됩니다.")
     @Parameters({
             @Parameter(name = "lat", description = "현재 위치의 위도. 가까운순으로 조회할 때만 전달해주세요."),
             @Parameter(name = "lon", description = "현재 위치의 경도. 가까운순으로 조회할 때만 전달해주세요."),

@@ -1,12 +1,9 @@
 package com.umc.ttt.domain.bookLetter.entity;
 
-import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +30,14 @@ public class BookLetter extends BaseEntity {
     @Column(nullable = false)
     private String editor;  // 에디터
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content; // 내용
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String coverImg;    // 대표 이미지
+
+    @OneToMany(mappedBy = "bookLetter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookLetterCategory> bookLetterCategories = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

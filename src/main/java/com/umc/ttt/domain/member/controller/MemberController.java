@@ -1,10 +1,7 @@
 package com.umc.ttt.domain.member.controller;
 
 import com.umc.ttt.domain.member.converter.MemberConverter;
-import com.umc.ttt.domain.member.dto.MemberKeywordDTO;
-import com.umc.ttt.domain.member.dto.MemberResponseDTO;
-import com.umc.ttt.domain.member.dto.MemberSignUpDTO;
-import com.umc.ttt.domain.member.dto.TokenResponseDTO;
+import com.umc.ttt.domain.member.dto.*;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.service.MemberCommandService;
 import com.umc.ttt.global.annotation.CurrentMember;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -105,24 +101,42 @@ public class MemberController {
     //소셜 회원가입/로그인
     // TODO idToken 테스트 , 구글에 요청 잘 되는지 확인해야함.
     @PostMapping("/google-login")
-    @Operation(summary = "소셜 회원가입/로그인", description = "테스트 : idtoken 테스트 후 회원가입/로그인 진행. ")
-    public ResponseEntity<?> validateToken(@RequestBody String idToken) {
-        try {
+    @Operation(summary = "소셜 회원가입/로그인", description = "따옴표 넣으시면 안됩니다!")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO> validateToken(@RequestBody String idToken) throws Exception {
+            log.info(idToken);
             Map<String, Object> userDetails = googleIdTokenVerify.authenticateUser(idToken);
-            return ResponseEntity.ok(userDetails);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (GeneralSecurityException | IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error validating the ID token: " + e.getMessage());
-        }
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO((Member) userDetails.get("member"), (String) userDetails.get("accessToken")));
     }
     
     
     //키워드 저장
     @PostMapping("/users/keyword/{memberId}")
+    @Operation(summary = "취향 분석 키워드 저장", description = "유저 취향 분석 키워드를 저장합니다. 로그인 전으로 memberId를 활용해주세요")
     public ApiResponse<String> savePreferredCategories(@PathVariable(name = "memberId") Long memberId, @Valid @RequestBody MemberKeywordDTO requestDTO) throws Exception {
         memberCommandService.saveGenreKeyword(memberId, requestDTO.getPreferCategory1(), requestDTO.getPreferBookId());
         memberCommandService.saveFormatKeyword(memberId, requestDTO.getPreferCategory2());
         return ApiResponse.onSuccess("선호 카테고리 저장 완료");
     }
+
+    @PatchMapping("/users/{memberId}")
+    @Operation(summary = "nickname, profile 저장", description = "nickname, profile 저장. 로그인 전으로 memberId를 활용해주세요")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO> saveProfile(@PathVariable(name = "memberId") Long memberId, @Valid @RequestBody MemberProfileDTO requestDTO) throws Exception {
+        Member member= memberCommandService.saveProfile(memberId, requestDTO);
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(member));
+    }
+
+    @PatchMapping("/users")
+    @Operation(summary = "nickname, profile, password 변경", description = "nickname, profile, password 변경하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO> updateInfo(@CurrentMember Member member, @Valid @RequestBody MemberUpdateInfoDTO requestDTO) throws Exception {
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(memberCommandService.updateInfo(member, requestDTO)));
+    }
+
+    @PostMapping("/users/verify-pw")
+    @Operation(summary = "비밀번호 검사", description = "비밀번호 변경 전 비밀번호 검사")
+    public ApiResponse<String> validatePassword(@CurrentMember Member member, @Valid @RequestBody MemberPassWordDTO requestDTO) throws Exception {
+        memberCommandService.validatePassword(member, requestDTO.getPassword());
+        return ApiResponse.onSuccess("비밀번호가 일치합니다.");
+    }
+
+
 }

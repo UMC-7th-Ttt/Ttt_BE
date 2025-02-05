@@ -11,25 +11,25 @@ import java.util.List;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     // 카테고리별 추천 순 정렬
-    @Query(value = "SELECT p.* FROM Place p WHERE p.category = :category " +
+    @Query(value = "SELECT p.* FROM place p WHERE p.category = :category " +
             "ORDER BY COALESCE(p.rating, 0) DESC LIMIT :limit", nativeQuery = true)
     List<Place> findFirstPageByCategoryOrderByRecommendation(@Param("category") String category, @Param("limit") int limit);
 
-    @Query(value = "SELECT p.* FROM Place p WHERE p.category = :category " +
-            "AND (COALESCE(p.rating, 0) < (SELECT COALESCE(rating, 0) FROM Place WHERE place_id = :cursor) " +
-            "OR (COALESCE(p.rating, 0) = (SELECT COALESCE(rating, 0) FROM Place WHERE place_id = :cursor) " +
+    @Query(value = "SELECT p.* FROM place p WHERE p.category = :category " +
+            "AND (COALESCE(p.rating, 0) < (SELECT COALESCE(rating, 0) FROM place WHERE place_id = :cursor) " +
+            "OR (COALESCE(p.rating, 0) = (SELECT COALESCE(rating, 0) FROM place WHERE place_id = :cursor) " +
             "AND p.place_id > :cursor)) " +
             "ORDER BY COALESCE(p.rating, 0) DESC LIMIT :limit", nativeQuery = true)
     List<Place> findByCategoryOrderByRecommendationWithCursor(@Param("category") String category, @Param("cursor") Long cursor, @Param("limit") int limit);
 
     // 추천 순 정렬
-    @Query(value = "SELECT p.* FROM Place p " +
+    @Query(value = "SELECT p.* FROM place p " +
             "ORDER BY COALESCE(p.rating, 0) DESC LIMIT :limit", nativeQuery = true)
     List<Place> findFirstPageOrderByRecommendation(@Param("limit") int limit);
 
-    @Query(value = "SELECT p.* FROM Place p " +
-            "WHERE (COALESCE(p.rating, 0) < (SELECT COALESCE(rating, 0) FROM Place WHERE place_id = :cursor) " +
-            "OR (COALESCE(p.rating, 0) = (SELECT COALESCE(rating, 0) FROM Place WHERE place_id = :cursor) " +
+    @Query(value = "SELECT p.* FROM place p " +
+            "WHERE (COALESCE(p.rating, 0) < (SELECT COALESCE(rating, 0) FROM place WHERE place_id = :cursor) " +
+            "OR (COALESCE(p.rating, 0) = (SELECT COALESCE(rating, 0) FROM place WHERE place_id = :cursor) " +
             "AND p.place_id > :cursor)) " +
             "ORDER BY COALESCE(p.rating, 0) DESC LIMIT :limit", nativeQuery = true)
     List<Place> findOrderByRecommendationWithCursor(@Param("cursor") Long cursor, @Param("limit") int limit);

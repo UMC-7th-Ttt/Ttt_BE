@@ -18,6 +18,8 @@ import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import com.umc.ttt.home.converter.HomeConverter;
+import com.umc.ttt.home.dto.HomeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,15 +67,18 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         // 사용자 참여 인증 조회
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
-        ReadingRecord readingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
-                .orElseThrow(() -> new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND));
 
+        Optional<ReadingRecord> latestReadingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
+                .stream()
+                .max(Comparator.comparing(ReadingRecord::getCreatedAt));
 
         // 오늘 날짜 기준 경과 주 계산
         int elapsedWeeks = calculateElapsedWeeks(bookClub.getStartDate(), 4);
 
         // 완독률 계산
-        int myCompletionRate = calculateUserCompletionRate(readingRecord.getCurrentPage(), book.getItemPage());
+        int myCompletionRate = latestReadingRecord
+                .map(record -> calculateUserCompletionRate(record.getCurrentPage(), book.getItemPage()))
+                .orElse(0);
         int recommendedCompletionRate = calculateRecommendedCompletionRate(book.getItemPage(), 4, bookClub.getStartDate());
 
         return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, memberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
@@ -82,13 +90,16 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         BookClub bookClub = bookClubRepository.findById(bookClubId)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
 
+        // BookClub 모집 현황 조회
+        Long numberOfMember = bookClubMemberRepository.countByBookClubId(bookClubId);
+
         // 책 정보 조회
         Book book = bookRepository.findBookByBookClub(bookClub)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_NOT_FOUND));
         boolean isScraped = bookScrapRepository.existsByScrapFolderMemberAndBook(member, book);
         BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO = BookConverter.toGetBookDetailResultDTO(book, isScraped);
 
-        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO);
+        return BookClubConverter.toGetBookClubJoinPageResultDTO(bookClub, getBookDetailResultDTO, numberOfMember);
     }
 
     public int calculateElapsedWeeks(LocalDate startDate, int totalWeeks) {
@@ -106,5 +117,27 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         int elapsedWeeks = calculateElapsedWeeks(startDate, totalWeeks);
 
         return (int) ((((double) bookTotalPages / totalWeeks) / bookTotalPages) * 100 * elapsedWeeks);
+    }
+
+    // 홈 화면에 나의 활동(북클럽)
+    public List<HomeResponseDTO.bookClubDTO> getActiveBookClubs(Long memberId){
+        List<BookClubMember> bookClubsMember = bookClubMemberRepository.findActiveBookClubsByMember(memberId);
+        System.out.println("111111111111111111111111-"+bookClubsMember.size());
+
+        return bookClubsMember.stream()
+                .map(bookClubMember -> {
+                    Optional<ReadingRecord> latestReadingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
+                            .stream()
+                            .max(Comparator.comparing(ReadingRecord::getCreatedAt));
+
+                    BookClub bookClub = bookClubMember.getBookClub();
+
+                    // 완독률 계산
+                    int completionRate = latestReadingRecord
+                            .map(record -> calculateUserCompletionRate(record.getCurrentPage(), bookClub.getBookLetterBook().getBook().getItemPage()))
+                            .orElse(0);
+
+                    return HomeConverter.toBookClubDTO(bookClub, completionRate);
+                }).collect(Collectors.toList());
     }
 }
