@@ -31,6 +31,20 @@ public class MemberConverter {
                 .build();
     }
 
+    public static MemberResponseDTO.MemberProfileDTO toMemberProfileDTO(Member member, String accessToken) {
+        return MemberResponseDTO.MemberProfileDTO.builder()
+                .createdAt(member.getCreatedAt())
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .profileUrl(member.getProfileUrl())
+                .role(member.getRole())
+                .accessToken(accessToken)
+                .build();
+    }
+
+
+
+
     public static TokenResponseDTO.UpdateResultDTO updateResultDTO(String token) {
         return TokenResponseDTO.UpdateResultDTO.builder()
                 .accessToken(token)
