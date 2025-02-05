@@ -53,12 +53,14 @@ public class PlaceConverter {
                 .build();
     }
 
-    public static PlaceResponseDTO.PlaceListDTO toPlaceListDTO(List<Place> places, Long nextCursor, int limit, boolean hasNext, List<Long> scrapedPlaceIds) {
+    public static PlaceResponseDTO.PlaceListDTO toPlaceListDTO(List<Place> places, Long nextCursor, int limit, boolean hasNext, List<Long> scrapedPlaceIds, String currentPlace, Member member) {
         List<PlaceResponseDTO.PlacePreviewDTO> placePreviewDTOs = places.stream()
                 .map(place -> toPlacePreviewDTO(place, scrapedPlaceIds.contains(place.getId())))
                 .toList();
 
         return PlaceResponseDTO.PlaceListDTO.builder()
+                .currentPlace(currentPlace)
+                .profileImg(member.getProfileUrl())
                 .places(placePreviewDTOs)
                 .cursor(nextCursor)
                 .limit(limit)

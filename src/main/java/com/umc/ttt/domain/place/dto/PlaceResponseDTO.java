@@ -56,6 +56,8 @@ public class PlaceResponseDTO {
     @Builder
     @Getter
     public static class PlaceListDTO {
+        private String currentPlace;
+        private String profileImg;
         private List<PlacePreviewDTO> places;
         private Long cursor;
         private int limit;
