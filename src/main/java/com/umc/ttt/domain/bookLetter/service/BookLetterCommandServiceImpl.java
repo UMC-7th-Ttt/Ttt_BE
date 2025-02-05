@@ -1,6 +1,8 @@
 package com.umc.ttt.domain.bookLetter.service;
 
 import com.umc.ttt.domain.book.entity.Book;
+import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.book.entity.BookFormatCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.bookLetter.Converter.BookLetterConverter;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterBookRepository;
@@ -9,6 +11,7 @@ import com.umc.ttt.domain.bookLetter.dto.BookLetterRequestDTO;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.BookLetterHandler;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,7 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     private final BookLetterRepository bookLetterRepository;
     private final BookRepository bookRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
+    private final MemberPreferredCategoryRepository memberPreferredCategoryRepository;
 
     // 북레터 추가
     @Override
@@ -127,8 +132,12 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     @Override
     @Transactional(readOnly = true)
     public List<HomeResponseDTO.recommendBookLetterDTO> getRecommendBookLetters(Member member) {
+        List<BookCategory> preferredBookCategories = memberPreferredCategoryRepository.findBookCategoriesByMemberId(member.getId());
+        List<BookFormatCategory> prefferedBookFormats = memberPreferredCategoryRepository.findBookFormatsByMemberId(member.getId());
+
+
         Pageable limit = PageRequest.of(0, 5);
-        List<BookLetter> recommendBookLeetters = bookLetterRepository.findRandomBookLettersByPreferredCategory(member.getId(), limit);
+        List<BookLetter> recommendBookLeetters = bookLetterRepository.findRandomBookLettersByPreferredCategory(preferredBookCategories, prefferedBookFormats, limit);
 
         return recommendBookLeetters.stream()
                 .map(HomeConverter::toRecommendBookLetterDTO)
