@@ -31,9 +31,7 @@ public class BookRestController {
 
     @GetMapping("/bestsellers")
     @Operation(summary = "베스트셀러 6권 조회 - 취향 분석", description = "베스트셀러 6권 조회 API이며, 취향 분석에 필요한 표지, 주요 문장 등을 제공합니다.")
-    public ApiResponse<BookResponseDTO.GetBestSellersResultDTO> getBestSellers() {
-        // TODO: 로그인한 회원 정보로 변경
-        Member member = memberRepository.findById(1L).get();
+    public ApiResponse<BookResponseDTO.GetBestSellersResultDTO> getBestSellers(@CurrentMember Member member) {
         BookResponseDTO.GetBestSellersResultDTO books = bookQueryService.getBestSellers(member);
         return ApiResponse.onSuccess(books);
     }
