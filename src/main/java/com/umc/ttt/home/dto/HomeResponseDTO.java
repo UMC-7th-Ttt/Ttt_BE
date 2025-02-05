@@ -75,6 +75,7 @@ public class HomeResponseDTO {
     @AllArgsConstructor
     public static class viewHomeResultDTO{
         String nickname;
+        String profileUrl;
         List<mainBannerDTO> mainBannerList;
         List<bookClubDTO> bookClubList;
         List<recommendBookLetterDTO> bookLetterList;

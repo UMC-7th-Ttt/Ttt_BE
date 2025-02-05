@@ -68,12 +68,13 @@ public class HomeConverter {
         return (content.length()>30)? content.substring(0, 30)+"..." : content;
     }
 
-    public static HomeResponseDTO.viewHomeResultDTO toViewHomeResultDTO(String nickName, List<HomeResponseDTO.mainBannerDTO> mainBannerList,
+    public static HomeResponseDTO.viewHomeResultDTO toViewHomeResultDTO(String nickName, String profileUrl, List<HomeResponseDTO.mainBannerDTO> mainBannerList,
                                                                         List<HomeResponseDTO.bookClubDTO> bookClubList,
                                                                         List<HomeResponseDTO.recommendBookLetterDTO> recommendBookLetterList,
                                                                         List<HomeResponseDTO.remindReviewDTO> remindReviewList) {
         return HomeResponseDTO.viewHomeResultDTO.builder()
                 .nickname(nickName)
+                .profileUrl(profileUrl)
                 .mainBannerList(mainBannerList)
                 .bookClubList(bookClubList)
                 .bookLetterList(recommendBookLetterList)

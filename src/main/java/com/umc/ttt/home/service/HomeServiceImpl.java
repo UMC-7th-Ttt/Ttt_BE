@@ -24,6 +24,7 @@ public class HomeServiceImpl implements HomeService{
     @Transactional(readOnly = true)
     public HomeResponseDTO.viewHomeResultDTO getHomeData(Member member) {
         String nickName = member.getNickname();
+        String profileUrl = member.getProfileUrl();
 
         // 메인 베너 (최근 북레터 3개)
         List<HomeResponseDTO.mainBannerDTO> recentBookLetterDTOList = bookLetterCommandService.getRecentBookLetters();
@@ -37,6 +38,6 @@ public class HomeServiceImpl implements HomeService{
         // 리마인드 (독서평)
         List<HomeResponseDTO.remindReviewDTO> remindReviewDTOList = reviewCommandService.getRandomReviewsByYear();
 
-        return HomeConverter.toViewHomeResultDTO(nickName, recentBookLetterDTOList, activeBookClubDTOList, recommentBookLetterDTOList, remindReviewDTOList);
+        return HomeConverter.toViewHomeResultDTO(nickName, profileUrl , recentBookLetterDTOList, activeBookClubDTOList, recommentBookLetterDTOList, remindReviewDTOList);
     }
 }
