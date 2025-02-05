@@ -22,9 +22,9 @@ public interface MemberCommandService {
 
     void isNicknameDuplicate(String nickname) throws Exception;
 
-    void saveGenreKeyword(Long memberId, List<String> keywords, Long bookId) throws Exception;
+    void saveGenreKeyword(Member member, List<String> keywords, Long bookId) throws Exception;
 
-    void saveFormatKeyword(Long memberId, List<String> keywords) throws Exception;
+    void saveFormatKeyword(Member member, List<String> keywords) throws Exception;
 
     List<String> extractTopCategories(List<String> categories) throws Exception;
 

@@ -149,7 +149,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
      * 장르 키워드 저장 (1,2,4 질문)
      **/
     @Override
-    public void saveGenreKeyword(Long memberId, List<String> keywords, Long bookId) throws Exception{
+    public void saveGenreKeyword(Member member, List<String> keywords, Long bookId) throws Exception{
         List<String> selectedCategories = new ArrayList<>();
 
         // 예를 들어, 책 이름을 이용한 처리가 있을 경우 여기에 추가.
@@ -162,14 +162,12 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             selectedCategories.add(book.getBookCategory().getCategoryName());
         }
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         for (String categoryName : selectedCategories) {
                 BookCategory bookCategory = bookCategoryRepository.findByCategoryName(categoryName)
                         .orElseThrow(() -> new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND));
 
-                if(!preferredCategoryRepository.existsMemberPreferredCategoriesByBookCategoryAndMember_Id(bookCategory,memberId)){
+                if(!preferredCategoryRepository.existsByBookCategoryAndMember(bookCategory,member)){
                     MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
                             .member(member)
                             .bookCategory(bookCategory)
@@ -180,7 +178,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
 
 
-        if(!preferredCategoryRepository.existsMemberPreferredCategoriesByBookCategoryAndMember_Id(book.getBookCategory(),memberId)){
+        if(!preferredCategoryRepository.existsByBookCategoryAndMember(book.getBookCategory(),member)){
             MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
                     .member(member)
                     .bookCategory(book.getBookCategory())
@@ -194,20 +192,17 @@ public class MemberCommandServiceImpl implements MemberCommandService {
      * 분량, 장소 키워드 저장(3번 질문)
      **/
     @Override
-    public void saveFormatKeyword(Long memberId, List<String> keywords) throws Exception {
+    public void saveFormatKeyword(Member member, List<String> keywords) throws Exception {
         List<String> selectedCategories = new ArrayList<>();
 
         // preferCategory1에서 상위 2개 선택
         selectedCategories.addAll(extractTopCategories(keywords));
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
         for (String categoryName : selectedCategories) {
                 BookFormatCategory bookFormatCategory = bookFormatCategoryRepository.findByCategoryName(categoryName)
                         .orElseThrow(() -> new BookHandler(ErrorStatus.CATEGORY_NOT_FOUND));
 
-                if(!preferredCategoryRepository.existsByBookFormatCategoryAndMember_Id(bookFormatCategory,memberId)){
+                if(!preferredCategoryRepository.existsByBookFormatCategoryAndMember(bookFormatCategory,member)){
                     MemberPreferredCategory preferredCategory = MemberPreferredCategory.builder()
                             .member(member)
                             .bookFormatCategory(bookFormatCategory)
@@ -217,6 +212,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 }
 
         }
+        member.setRole(Role.USER);
+        memberRepository.save(member);
 
     }
 
