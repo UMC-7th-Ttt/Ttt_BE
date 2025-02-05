@@ -101,16 +101,11 @@ public class MemberController {
     //소셜 회원가입/로그인
     // TODO idToken 테스트 , 구글에 요청 잘 되는지 확인해야함.
     @PostMapping("/google-login")
-    @Operation(summary = "소셜 회원가입/로그인", description = "테스트 : idtoken 테스트 후 회원가입/로그인 진행. ")
-    public ResponseEntity<?> validateToken(@RequestBody String idToken) {
-        try {
+    @Operation(summary = "소셜 회원가입/로그인", description = "따옴표 넣으시면 안됩니다!")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO> validateToken(@RequestBody String idToken) throws Exception {
+            log.info(idToken);
             Map<String, Object> userDetails = googleIdTokenVerify.authenticateUser(idToken);
-            return ResponseEntity.ok(userDetails);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (GeneralSecurityException | IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error validating the ID token: " + e.getMessage());
-        }
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO((Member) userDetails.get("member"), (String) userDetails.get("accessToken")));
     }
     
     
