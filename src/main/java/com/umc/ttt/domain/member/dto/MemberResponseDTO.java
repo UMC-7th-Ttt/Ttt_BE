@@ -1,5 +1,6 @@
 package com.umc.ttt.domain.member.dto;
 
+import com.umc.ttt.domain.member.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,5 +29,7 @@ public class MemberResponseDTO {
         Long id;
         String nickname;
         String profileUrl;
+        Role role;
+        String accessToken;
     }
 }
