@@ -1,5 +1,6 @@
 package com.umc.ttt.domain.member.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.umc.ttt.domain.member.entity.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class MemberResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberProfileDTO {
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
         LocalDateTime createdAt;
         Long id;
         String nickname;
