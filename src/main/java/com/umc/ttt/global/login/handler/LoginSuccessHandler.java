@@ -2,8 +2,14 @@ package com.umc.ttt.global.login.handler;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.umc.ttt.domain.member.converter.MemberConverter;
+import com.umc.ttt.domain.member.dto.MemberResponseDTO;
+import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.repository.MemberRepository;
 import com.umc.ttt.global.apiPayload.ApiResponse;
+import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import com.umc.ttt.global.apiPayload.exception.handler.MemberHandler;
 import com.umc.ttt.global.jwt.entity.GeneratedToken;
 import com.umc.ttt.global.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,19 +41,27 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String accessToken = generatedToken.getAccessToken();
         String refreshToken = generatedToken.getRefreshToken();
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+//        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
 
         log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
         log.info("발급된 AccessToken 만료 기간 : {}", accessTokenExpiration);
 
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
         // 응답 바디에 ApiResponse 추가
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        ApiResponse apiResponse = ApiResponse.onSuccess("로그인에 성공했습니다!");
+        ApiResponse apiResponse = ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(member, accessToken));
+
+        MemberResponseDTO.MemberProfileDTO profileDTO = MemberConverter.toMemberProfileDTO(member, accessToken);
+        log.info("변환된 DTO: {}", profileDTO);
+
 
         try {
             ObjectMapper objectMapper = new ObjectMapper(); // JSON 변환을 위한 ObjectMapper 생성
+            objectMapper.registerModule(new JavaTimeModule());
             String jsonResponse = objectMapper.writeValueAsString(apiResponse); // ApiResponse를 JSON으로 변환
             response.getWriter().write(jsonResponse); // 응답 바디에 JSON 작성
         } catch (Exception e) {

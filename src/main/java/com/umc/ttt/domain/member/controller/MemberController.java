@@ -110,11 +110,11 @@ public class MemberController {
     
     
     //키워드 저장
-    @PostMapping("/users/keyword/{memberId}")
-    @Operation(summary = "취향 분석 키워드 저장", description = "유저 취향 분석 키워드를 저장합니다. 로그인 전으로 memberId를 활용해주세요")
-    public ApiResponse<String> savePreferredCategories(@PathVariable(name = "memberId") Long memberId, @Valid @RequestBody MemberKeywordDTO requestDTO) throws Exception {
-        memberCommandService.saveGenreKeyword(memberId, requestDTO.getPreferCategory1(), requestDTO.getPreferBookId());
-        memberCommandService.saveFormatKeyword(memberId, requestDTO.getPreferCategory2());
+    @PostMapping("/users/keyword")
+    @Operation(summary = "취향 분석 키워드 저장", description = "유저 취향 분석 키워드를 저장합니다.로그인 후 accessToken을 활용하세요")
+    public ApiResponse<String> savePreferredCategories(@CurrentMember Member member, @Valid @RequestBody MemberKeywordDTO requestDTO) throws Exception {
+        memberCommandService.saveGenreKeyword(member, requestDTO.getPreferCategory1(), requestDTO.getPreferBookId());
+        memberCommandService.saveFormatKeyword(member, requestDTO.getPreferCategory2());
         return ApiResponse.onSuccess("선호 카테고리 저장 완료");
     }
 

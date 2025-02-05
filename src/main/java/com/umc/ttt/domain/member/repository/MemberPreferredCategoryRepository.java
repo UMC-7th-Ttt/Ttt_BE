@@ -13,8 +13,8 @@ import java.util.List;
 
 @Repository
 public interface MemberPreferredCategoryRepository extends JpaRepository<MemberPreferredCategory, Long> {
-    boolean existsMemberPreferredCategoriesByBookCategoryAndMember_Id(BookCategory bookCategory, Long member_id);
-    boolean existsByBookFormatCategoryAndMember_Id(BookFormatCategory bookFormatCategory, Long member_id);
+    boolean existsByBookCategoryAndMember(BookCategory bookCategory, Member member);
+    boolean existsByBookFormatCategoryAndMember(BookFormatCategory bookFormatCategory, Member member);
 
     List<MemberPreferredCategory> findByMember(Member member);
 
