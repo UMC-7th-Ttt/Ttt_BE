@@ -15,6 +15,8 @@ import com.umc.ttt.domain.review.repository.ReviewRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
+import com.umc.ttt.home.converter.HomeConverter;
+import com.umc.ttt.home.dto.HomeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -153,4 +156,17 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     public Review getReviewInfo(Long reviewId) {
         return reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
     }
+
+    // 홈화면 서평 가져오기 (랜덤 5개)
+    @Override
+    @Transactional(readOnly = true)
+    public List<HomeResponseDTO.remindReviewDTO> getRandomReviewsByYear() {
+        Pageable limit = PageRequest.of(0,5);
+        List<Review> reviews = reviewRepository.findRandomReviewByYear(limit);
+
+        return reviews.stream()
+                .map(HomeConverter::toRemindReviewDTO).collect(Collectors.toList());
+    }
+
+
 }

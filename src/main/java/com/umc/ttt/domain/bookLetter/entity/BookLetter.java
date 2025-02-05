@@ -1,6 +1,7 @@
 package com.umc.ttt.domain.bookLetter.entity;
 
 import com.umc.ttt.domain.book.entity.Book;
+import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -38,6 +39,10 @@ public class BookLetter extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String coverImg;    // 대표 이미지
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="book_category_id")
+    private BookCategory bookCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

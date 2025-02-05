@@ -18,6 +18,8 @@ import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.scrap.repository.BookScrapRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import com.umc.ttt.home.converter.HomeConverter;
+import com.umc.ttt.home.dto.HomeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -114,5 +117,27 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         int elapsedWeeks = calculateElapsedWeeks(startDate, totalWeeks);
 
         return (int) ((((double) bookTotalPages / totalWeeks) / bookTotalPages) * 100 * elapsedWeeks);
+    }
+
+    // 홈 화면에 나의 활동(북클럽)
+    public List<HomeResponseDTO.bookClubDTO> getActiveBookClubs(Long memberId){
+        List<BookClubMember> bookClubsMember = bookClubMemberRepository.findActiveBookClubsByMember(memberId);
+        System.out.println("111111111111111111111111-"+bookClubsMember.size());
+
+        return bookClubsMember.stream()
+                .map(bookClubMember -> {
+                    Optional<ReadingRecord> latestReadingRecord = readingRecordRepository.findByBookClubMember(bookClubMember)
+                            .stream()
+                            .max(Comparator.comparing(ReadingRecord::getCreatedAt));
+
+                    BookClub bookClub = bookClubMember.getBookClub();
+
+                    // 완독률 계산
+                    int completionRate = latestReadingRecord
+                            .map(record -> calculateUserCompletionRate(record.getCurrentPage(), bookClub.getBookLetterBook().getBook().getItemPage()))
+                            .orElse(0);
+
+                    return HomeConverter.toBookClubDTO(bookClub, completionRate);
+                }).collect(Collectors.toList());
     }
 }
