@@ -28,6 +28,28 @@ public class BookConverter {
                 .build();
     }
 
+    public static BookResponseDTO.GetBestSellersResultDTO toGetBestSellersResultDTO(List<Book> books) {
+        List<BookResponseDTO.BestSellerDTO> BestSellerList = books.stream()
+                .map(book -> toBestSellerDTO(book))
+                .collect(Collectors.toList());
+
+        return BookResponseDTO.GetBestSellersResultDTO.builder()
+                .books(BestSellerList)
+                .build();
+    }
+
+    public static BookResponseDTO.BestSellerDTO toBestSellerDTO(Book book) {
+        return BookResponseDTO.BestSellerDTO.builder()
+                .id(book.getId())
+                .cover(book.getCover())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .category(book.getBookCategory().getCategoryName())
+                .publisher(book.getPublisher())
+                .mainSentences(book.getMainSentences())
+                .build();
+    }
+
     public static BookResponseDTO.SearchBookResultDTO toSearchBooksResultDTO(List<Book> books, long nextCursor, int limit, boolean hasNext, List<Long> scrapedBookIds) {
         List<BookResponseDTO.BookInfoDTO> bookInfoList = books.stream()
                 .map(book -> toBookInfoDTO(book, scrapedBookIds.contains(book.getId())))

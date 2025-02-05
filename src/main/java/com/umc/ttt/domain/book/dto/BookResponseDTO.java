@@ -23,6 +23,28 @@ public class BookResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class GetBestSellersResultDTO {
+        private List<BestSellerDTO> books;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BestSellerDTO {
+        private Long id;
+        private String cover;
+        private String title;
+        private String author;
+        private String category;
+        private String publisher;
+        private String mainSentences;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SuggestBooksResultDTO {
         private List<BookInfoDTO> books;
     }

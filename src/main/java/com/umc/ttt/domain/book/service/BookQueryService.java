@@ -6,6 +6,8 @@ import com.umc.ttt.domain.member.entity.Member;
 public interface BookQueryService {
     BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member);
 
+    BookResponseDTO.GetBestSellersResultDTO getBestSellers(Member member);
+
     BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member);
 
     BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member);

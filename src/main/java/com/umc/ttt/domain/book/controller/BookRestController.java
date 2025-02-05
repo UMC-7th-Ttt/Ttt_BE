@@ -29,6 +29,13 @@ public class BookRestController {
         return ApiResponse.onSuccess("알라딘 Open API 데이터가 저장되었습니다.");
     }
 
+    @GetMapping("/bestsellers")
+    @Operation(summary = "베스트셀러 6권 조회 - 취향 분석", description = "베스트셀러 6권 조회 API이며, 취향 분석에 필요한 표지, 주요 문장 등을 제공합니다.")
+    public ApiResponse<BookResponseDTO.GetBestSellersResultDTO> getBestSellers(@CurrentMember Member member) {
+        BookResponseDTO.GetBestSellersResultDTO books = bookQueryService.getBestSellers(member);
+        return ApiResponse.onSuccess(books);
+    }
+
     @GetMapping("/search")
     @Operation(summary = "책 검색", description = "책 검색 API이며, 검색 결과는 커서를 기반으로 페이징 처리됩니다.\n\n" +
             "첫 페이지 조회 시 cursor 값으로 0을 전달해주세요.\n\n" +

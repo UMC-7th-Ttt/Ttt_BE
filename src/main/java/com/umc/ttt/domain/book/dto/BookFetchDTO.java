@@ -36,7 +36,7 @@ public class BookFetchDTO {
         private String isbn;
         private String publisher;
         private String description;
-        private String bestRank;
+        private int bestRank;
         private String link;
         private int itemPage;
         private boolean hasEbook;

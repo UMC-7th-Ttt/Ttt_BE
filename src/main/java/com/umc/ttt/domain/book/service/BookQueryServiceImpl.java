@@ -52,6 +52,32 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
+    public BookResponseDTO.GetBestSellersResultDTO getBestSellers(Member member) {
+        // TODO: 배스트셀러로 변경
+        List<String> titles = Arrays.asList("이처럼 사소한 것들", "급류", "서랍에 저녁을 넣어 두었다 - 2024 노벨문학상 수상작가", "희랍어 시간 - 2024 노벨문학상 수상작가", "너의 유토피아", "대온실 수리 보고서");
+
+        List<Book> books = titles.stream()
+                .map(bookRepository::findBookByTitle)
+                .flatMap(Optional::stream)
+                .toList();
+
+        return BookConverter.toGetBestSellersResultDTO(books);
+
+//        List<Book> books = bookRepository.findAll();
+//
+//        // bestRank가 1~5인 책 필터링
+//        List<Book> filteredBooks = books.stream()
+//                .filter(book -> book.getBestRank() >= 1 && book.getBestRank() <= 5)
+//                .collect(Collectors.toList());
+//
+//        // 최대 5권을 랜덤으로 선택
+//        Collections.shuffle(filteredBooks);
+//        List<Book> selectedBooks = filteredBooks.stream().limit(5).collect(Collectors.toList());
+//
+//        return BookConverter.toGetBestSellersResultDTO(selectedBooks);
+    }
+
+    @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
         // 카테고리 매핑 정의
         Map<String, List<String>> categoryMapping = Map.of(
