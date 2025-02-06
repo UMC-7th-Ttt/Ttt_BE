@@ -39,6 +39,10 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     @Override
     @Transactional
     public Review addReview(ReviewRequestDTO.AddUpdateDto request, Member member) {
+        if(reviewRepository.existsByMemberIdAndWriteDate(member.getId(), request.getWriteDate())) {
+            throw new ReviewHandler(ErrorStatus.REVIEW_ALREADY_EXIST);
+        }
+
         // 서평 생성
         Book book=null;
         Place place=null;
@@ -53,8 +57,13 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
             validateRanking(request.getPlaceRanking());
             place = placeRepository.findById(request.getPlaceId()).orElseThrow(()-> new PlaceHandler(ErrorStatus.PLACE_NOT_FOUND));
         }
-        Review review = ReviewConverter.toReview(request, member, book, place);
 
+        if(place==null && book==null){
+            throw new ReviewHandler(ErrorStatus.MISSING_REVIEW_CONTENT);
+        }
+
+        Review review = ReviewConverter.toReview(request, member, book, place);
+        reviewRepository.save(review);
 
         // 공간에 대한 리뷰가 있을 경우, 해당 공간의 평점 계산 후 업데이트
         if (place != null) {
@@ -65,7 +74,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
             updateBookRanking(book);
         }
 
-        return reviewRepository.save(review);
+        return review;
     }
 
     // 장소 리뷰 계산
@@ -132,7 +141,10 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
 
         // 작성 날짜 수정되었으면 수정
-        if(review.getWriteDate() != request.getWriteDate()){
+        if(!request.getWriteDate().equals(review.getWriteDate())){
+            if(reviewRepository.existsByMemberIdAndWriteDate(member.getId(), request.getWriteDate())) {
+                throw new ReviewHandler(ErrorStatus.REVIEW_ALREADY_EXIST);
+            }
             review.setWriteDate(request.getWriteDate());
         }
 

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    Review findByMemberIdAndWriteDate(Long member_id, LocalDate writeDate);
+    boolean existsByMemberIdAndWriteDate(Long member_id, LocalDate writeDate);
 
     // 서평 캘린더 보기
     @Query(value = "SELECT r " +
