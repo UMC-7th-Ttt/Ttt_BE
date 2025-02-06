@@ -121,17 +121,31 @@ public class MemberController {
         return ApiResponse.onSuccess("선호 카테고리 저장 완료");
     }
 
-    @PostMapping(value = "/users/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/users", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "nickname, profile 저장", description = "nickname, profile 저장. 로그인 전으로 memberId를 활용해주세요")
-    public ApiResponse<MemberResponseDTO.MemberProfileDTO> saveProfile(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @RequestPart @Valid MemberAddProfileDTO requestDTO, @RequestPart("profilePicture") MultipartFile profilePicture) throws Exception {
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO2> saveProfile(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @RequestPart @Valid MemberAddProfileDTO requestDTO, @RequestPart("profilePicture") MultipartFile profilePicture) throws Exception {
         Member member= memberCommandService.saveProfile(requestDTO, profilePicture);
         return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(member));
     }
 
-    @PatchMapping("/users")
-    @Operation(summary = "nickname, profile, password 변경", description = "nickname, profile, password 변경하는 API입니다.")
-    public ApiResponse<MemberResponseDTO.MemberProfileDTO> updateInfo(@CurrentMember Member member, @Valid @RequestBody MemberUpdateInfoDTO requestDTO) throws Exception {
-        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(memberCommandService.updateInfo(member, requestDTO)));
+    @PatchMapping(value = "/users", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "nickname, profile 변경", description = "nickname, profile 변경하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO2> updateProfile(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @Valid @RequestPart MemberUpdateProfileDTO requestDTO,
+                                                                      @RequestPart("profilePicture") MultipartFile profilePicture,@CurrentMember Member member) throws Exception {
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(memberCommandService.updateProfile(member, requestDTO.getNickname(), profilePicture)));
+    }
+
+    @GetMapping("/users")
+    @Operation(summary = "유저 정보 조회", description = "유저정보 조회하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO2> getUser(@CurrentMember Member member) throws Exception {
+        return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(member));
+    }
+
+    @PatchMapping("/users/password")
+    @Operation(summary = "password 변경", description = "password 변경하는 API입니다.따옴표 제외!")
+    public ApiResponse<String> updatePassWord(@CurrentMember Member member, @RequestBody String password) throws Exception {
+        memberCommandService.updatePassWord(member, password);
+        return ApiResponse.onSuccess("비밀번호 변경에 성공했습니다.");
     }
 
     @PostMapping("/users/verify-pw")
