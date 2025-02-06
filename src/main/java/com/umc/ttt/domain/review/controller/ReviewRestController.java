@@ -22,10 +22,19 @@ import java.util.List;
 public class ReviewRestController {
     private final ReviewCommandService reviewCommandService;
 
-    @PutMapping("/")
+    @PostMapping("/")
     @Operation(summary = "서평 작성",description = "작성한 서평을 저장하는 API입니다.")
-    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> add(@RequestBody @Valid ReviewRequestDTO.AddUpdateDto request, @CurrentMember Member member) {
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> addReview(@RequestBody @Valid ReviewRequestDTO.AddUpdateDto request, @CurrentMember Member member) {
         Review review = reviewCommandService.addReview(request, member);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
+    @PatchMapping("/{reviewId}")
+    @Operation(summary = "서평 수정", description = "서평을 수정하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> updateReview(@PathVariable(name = "reviewId") Long reviewId,
+                                                                          @RequestBody @Valid ReviewRequestDTO.AddUpdateDto request,
+                                                                          @CurrentMember Member member) {
+        Review review = reviewCommandService.updateReview(reviewId, request, member);
         return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
     }
 

@@ -3,7 +3,6 @@ package com.umc.ttt.domain.review.service;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.member.entity.Member;
-import com.umc.ttt.domain.member.handler.MemberHandler;
 import com.umc.ttt.domain.place.entity.Place;
 import com.umc.ttt.domain.place.repository.PlaceRepository;
 import com.umc.ttt.domain.review.converter.ReviewConverter;
@@ -36,7 +35,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     private final PlaceRepository placeRepository;
     private final BookRepository bookRepository;
 
-    // 서평 작성 및 수정
+    // 서평 작성
     @Override
     @Transactional
     public Review addReview(ReviewRequestDTO.AddUpdateDto request, Member member) {
@@ -44,59 +43,136 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         Book book=null;
         Place place=null;
         if(request.getBookId()!=null){
+            // 서평에 책이 존재한다면 별점이 1이상 5이하이며 0.5 간격인지 확인
+            validateRanking(request.getBookRanking());
             book = bookRepository.findById(request.getBookId()).orElseThrow(()-> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
         }
 
         if(request.getPlaceId()!=null){
+            // 서평에 장소가 존재한다면 별점이 1이상 5이하이며 0.5 간격인지 확인
+            validateRanking(request.getPlaceRanking());
             place = placeRepository.findById(request.getPlaceId()).orElseThrow(()-> new PlaceHandler(ErrorStatus.PLACE_NOT_FOUND));
-        }
-
-        // 서평에 책이 존재한다면 별점이 1이상 5이하이며 0.5 간격인지 확인
-        if(book != null && (request.getBookRanking()<1.0 || request.getBookRanking()>5.0 || request.getBookRanking()%0.5!=0)){
-            throw new ReviewHandler(ErrorStatus.INVALID_REVIEW_RANKING);
-        }
-
-        // 서평에 장소가 존재한다면 별점이 1이상 5이하이며 0.5 간격인지 확인
-        if(place != null && (request.getPlaceRanking()<1.0 || request.getPlaceRanking()>5.0 || request.getPlaceRanking()%0.5!=0)){
-            throw new ReviewHandler(ErrorStatus.INVALID_REVIEW_RANKING);
         }
         Review review = ReviewConverter.toReview(request, member, book, place);
 
+
         // 공간에 대한 리뷰가 있을 경우, 해당 공간의 평점 계산 후 업데이트
         if (place != null) {
-            List<Review> placeReviews = reviewRepository.findAllByPlace(place);
-
-            // 평점 평균 계산
-            double averageRating = Stream.concat(
-                            placeReviews.stream().mapToDouble(Review::getPlaceRanking).boxed(), // 기존 리뷰들의 평점
-                            Stream.of(request.getPlaceRanking()) // 현재 리뷰의 평점
-                    )
-                    .mapToDouble(Double::doubleValue)
-                    .average()
-                    .orElse(0.0); // 평점이 없으면 0.0으로 처리
-
-            place.updateRating(averageRating);
-            placeRepository.save(place);
+            updatePlaceRanking(place, request.getPlaceRanking());
         }
-
         // 도서에 대한 리뷰가 있을 경우, 해당 도서의 평점 계산 후 업데이트
         if (book != null) {
-            List<Review> bookReviews = reviewRepository.findAllByBook(book);
-
-            // 평점 평균 계산
-            double averageBookRating = Stream.concat(
-                            bookReviews.stream().mapToDouble(Review::getBookRanking).boxed(), // 기존 리뷰들의 평점
-                            Stream.of(request.getBookRanking()) // 현재 리뷰의 평점
-                    )
-                    .mapToDouble(Double::doubleValue)
-                    .average()
-                    .orElse(0.0); // 평점이 없으면 0.0으로 처리
-
-            book.updateRating(averageBookRating);
-            bookRepository.save(book);
+            updateBookRanking(book, request.getBookRanking());
         }
 
         return reviewRepository.save(review);
+    }
+
+    // 장소 리뷰 계산
+    private void updatePlaceRanking(Place place, double placeRanking){
+        List<Review> placeReviews = reviewRepository.findAllByPlace(place);
+
+        // 평점 평균 계산
+        double averageRating = Stream.concat(
+                        placeReviews.stream().mapToDouble(Review::getPlaceRanking).boxed(), // 기존 리뷰들의 평점
+                        Stream.of(placeRanking) // 현재 리뷰의 평점
+                )
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0); // 평점이 없으면 0.0으로 처리
+
+        place.updateRating(averageRating);
+        placeRepository.save(place);
+    }
+
+    // 도서 리뷰 계산
+    private void updateBookRanking(Book book, double bookRanking){
+        List<Review> bookReviews = reviewRepository.findAllByBook(book);
+
+        // 평점 평균 계산
+        double averageBookRating = Stream.concat(
+                        bookReviews.stream().mapToDouble(Review::getBookRanking).boxed(), // 기존 리뷰들의 평점
+                        Stream.of(bookRanking) // 현재 리뷰의 평점
+                )
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0); // 평점이 없으면 0.0으로 처리
+
+        book.updateRating(averageBookRating);
+        bookRepository.save(book);
+    }
+
+    private void validateRanking(double ranking){
+        if(ranking<1.0 || ranking>5.0 || ranking%0.5!=0){
+            throw new ReviewHandler(ErrorStatus.INVALID_REVIEW_RANKING);
+        }
+    }
+
+    private Book updateBookReview(Review review, Long bookId, double bookRanking){
+        if(bookId == null){
+            review.setBookReview(0,null);
+            return null;
+        }
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
+        validateRanking(bookRanking);
+        review.setBookReview(bookRanking, book);
+        return book;
+    }
+
+    private Place updatePlaceReview(Review review, Long placeId, double placeRanking){
+        if(placeId == null){
+            review.setPlaceReview(0,null);
+            return null;
+        }
+        Place place = placeRepository.findById(placeId).orElseThrow(()-> new PlaceHandler(ErrorStatus.PLACE_NOT_FOUND));
+        validateRanking(placeRanking);
+        review.setPlaceReview(placeRanking, place);
+        return place;
+    }
+
+    @Override
+    public Review updateReview(Long reviewId, ReviewRequestDTO.AddUpdateDto request, Member member) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        // 작성 날짜 수정되었으면 수정
+        if(review.getWriteDate() != request.getWriteDate()){
+            review.setWriteDate(request.getWriteDate());
+        }
+
+        // 공개 여부 수정되었으면 수정
+        if(review.getIsSecret() != request.getIsSecret()){
+            review.setIsSecret(request.getIsSecret());
+        }
+
+        // 서평 제목 혹은 내용이 수정되었다면 수정
+        if(!request.getTitle().equals(review.getTitle()) || !request.getContent().equals(review.getContent())){
+            review.setInfo(request.getTitle(), request.getContent());
+        }
+
+        // 책 관련 서평이 수정되었을 때
+        Book removeBook = review.getBook();
+        Place removePlace = review.getPlace();
+
+        Book updateBook = updateBookReview(review, request.getBookId(), request.getBookRanking());
+        Place updatePlace = updatePlaceReview(review, request.getPlaceId(), request.getPlaceRanking());
+
+        reviewRepository.save(review);
+
+        if(removeBook != null){
+            updateBookRanking(removeBook, 0.0);
+        }
+        if(updateBook != null){
+            updateBookRanking(updateBook, request.getBookRanking());
+        }
+
+        if(removePlace != null){
+            updatePlaceRanking(removePlace, 0.0);
+        }
+        if(updatePlace != null){
+            updatePlaceRanking(updatePlace, request.getPlaceRanking());
+        }
+
+        return review;
     }
 
     // 서평 캘린더 보기
