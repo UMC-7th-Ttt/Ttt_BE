@@ -87,6 +87,8 @@ public enum ErrorStatus implements BaseErrorCode {
     // 리뷰 관련
     INVALID_REVIEW_RANKING(HttpStatus.BAD_REQUEST, "REVIEWRANKING401", "별점은 1이상 5이하이며 0.5 간격입니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW404", "서평이 존재하지 않습니다."),
+    REVIEW_ALREADY_EXIST(HttpStatus.BAD_REQUEST,"REVIEW400", "이미 작성한 날짜입니다. 기록이 아닌 수정해주세요"),
+    MISSING_REVIEW_CONTENT(HttpStatus.BAD_REQUEST, "REVIEW_CONTENT400", "책 평점, 장소 평점 중 최소 하나를 작성해야 합니다."),
 
     // 페이지 관련
     INVALID_PAGE(HttpStatus.BAD_REQUEST, "PAGE401", "존재하지 않는 페이지입니다.");
