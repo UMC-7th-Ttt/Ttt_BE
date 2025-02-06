@@ -11,6 +11,7 @@ import com.umc.ttt.global.jwt.service.JwtService;
 import com.umc.ttt.global.jwt.service.RefreshTokenService;
 import com.umc.ttt.global.oauth2.service.GoogleIdTokenVerify;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -18,8 +19,10 @@ import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -118,10 +121,10 @@ public class MemberController {
         return ApiResponse.onSuccess("선호 카테고리 저장 완료");
     }
 
-    @PatchMapping("/users/{memberId}")
+    @PostMapping(value = "/users/profile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "nickname, profile 저장", description = "nickname, profile 저장. 로그인 전으로 memberId를 활용해주세요")
-    public ApiResponse<MemberResponseDTO.MemberProfileDTO> saveProfile(@PathVariable(name = "memberId") Long memberId, @Valid @RequestBody MemberProfileDTO requestDTO) throws Exception {
-        Member member= memberCommandService.saveProfile(memberId, requestDTO);
+    public ApiResponse<MemberResponseDTO.MemberProfileDTO> saveProfile(@Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @RequestPart @Valid MemberAddProfileDTO requestDTO, @RequestPart("profilePicture") MultipartFile profilePicture) throws Exception {
+        Member member= memberCommandService.saveProfile(requestDTO, profilePicture);
         return ApiResponse.onSuccess(MemberConverter.toMemberProfileDTO(member));
     }
 

@@ -6,8 +6,7 @@ import com.umc.ttt.domain.book.entity.BookFormatCategory;
 import com.umc.ttt.domain.book.repository.BookCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookFormatCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookRepository;
-import com.umc.ttt.domain.member.dto.MemberKeywordDTO;
-import com.umc.ttt.domain.member.dto.MemberProfileDTO;
+import com.umc.ttt.domain.member.dto.MemberAddProfileDTO;
 import com.umc.ttt.domain.member.dto.MemberSignUpDTO;
 import com.umc.ttt.domain.member.dto.MemberUpdateInfoDTO;
 import com.umc.ttt.domain.member.entity.Member;
@@ -24,6 +23,9 @@ import com.umc.ttt.global.apiPayload.exception.GeneralException;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.JwtHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.MemberHandler;
+import com.umc.ttt.global.aws.s3.entity.Uuid;
+import com.umc.ttt.global.aws.s3.repository.UuidRepository;
+import com.umc.ttt.global.aws.s3.service.AmazonS3Manager;
 import com.umc.ttt.global.jwt.entity.RefreshToken;
 import com.umc.ttt.global.jwt.repository.RefreshTokenRepository;
 import com.umc.ttt.global.jwt.service.JwtService;
@@ -32,9 +34,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.google.common.io.Files.getFileExtension;
+
 
 @Slf4j
 @Service
@@ -50,6 +56,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberPreferredCategoryRepository preferredCategoryRepository;
     private final BookRepository bookRepository;
     private final BookFormatCategoryRepository bookFormatCategoryRepository;
+
+    private final AmazonS3Manager s3Manager;
+
+    private final UuidRepository uuidRepository;
 
     @Override
     public Member signUp(MemberSignUpDTO memberSignUpDto) throws Exception {
@@ -232,21 +242,21 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
-    public Member saveProfile(Long memberId, MemberProfileDTO memberProfileDTO) throws Exception {
+    public Member saveProfile(MemberAddProfileDTO memberProfileDTO, MultipartFile profilePicture) throws Exception {
         // 회원 정보 조회
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findById(memberProfileDTO.getMemberId())
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        // 닉네임이 제공된 경우 업데이트
-        if (memberProfileDTO.getNickname() != null) {
-            member.setNickname(memberProfileDTO.getNickname());
-        }
 
-        // 프로필 URL이 제공된 경우 업데이트
-        if (memberProfileDTO.getProfileUrl() != null) {
-            member.setProfileUrl(memberProfileDTO.getProfileUrl());
-        }
+        member.setNickname(memberProfileDTO.getNickname());
 
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+
+        String pictureUrl = s3Manager.uploadFile(s3Manager.generateProfileKeyName(savedUuid) + "." + getFileExtension(profilePicture.getOriginalFilename()), profilePicture);
+
+        member.setProfileUrl(pictureUrl);
         member.setRole(Role.USER);
         // 변경된 회원 정보 저장
         memberRepository.save(member);
