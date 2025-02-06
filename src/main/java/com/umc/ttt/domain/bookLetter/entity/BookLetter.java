@@ -1,6 +1,9 @@
 package com.umc.ttt.domain.bookLetter.entity;
 
+import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import com.umc.ttt.global.apiPayload.exception.handler.BookLetterHandler;
 import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +13,6 @@ import java.util.List;
 
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
@@ -45,5 +47,13 @@ public class BookLetter extends BaseEntity {
 
     @OneToMany(mappedBy = "bookLetter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookLetterBook> books = new ArrayList<>();
+
+    public void setBookLetterContens(String title, String subTitle, String editor, String content, String coverImg) {
+        this.title = title;
+        this.subtitle = subTitle;
+        this.editor = editor;
+        this.content = content;
+        this.coverImg = coverImg;
+    }
 
 }

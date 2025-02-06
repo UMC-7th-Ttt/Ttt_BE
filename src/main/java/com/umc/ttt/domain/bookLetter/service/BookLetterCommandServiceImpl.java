@@ -3,13 +3,19 @@ package com.umc.ttt.domain.bookLetter.service;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.entity.BookFormatCategory;
+import com.umc.ttt.domain.book.repository.BookCategoryRepository;
+import com.umc.ttt.domain.book.repository.BookFormatCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.bookLetter.Converter.BookLetterConverter;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterBookRepository;
+import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterCategoryRepository;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterRepository;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterRequestDTO;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
+import com.umc.ttt.domain.bookLetter.entity.BookLetterCategory;
+import com.umc.ttt.domain.bookLetter.handler.BookLetterBookHandler;
+import com.umc.ttt.domain.bookLetter.handler.BookLetterCategoryHandler;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
@@ -21,12 +27,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +43,9 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     private final BookRepository bookRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
     private final MemberPreferredCategoryRepository memberPreferredCategoryRepository;
+    private final BookCategoryRepository bookCategoryRepository;
+    private final BookFormatCategoryRepository bookFormatCategoryRepository;
+    private final BookLetterCategoryRepository bookLetterCategoryRepository;
 
     // 북레터 추가
     @Override
@@ -55,7 +66,37 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
         List<BookLetterBook> bookLetterBooks = BookLetterConverter.toBookLetterBook(books,bookLetter);
         bookLetterBookRepository.saveAll(bookLetterBooks);
 
+        // 북레터 카테고리 저장
+        saveCategory(request.getCategoryIdList1(), request.getCategortIDList2(), bookLetter);
+
         return bookLetter;
+    }
+
+    // 카테고리들 저장
+    private void saveCategory(List<Long> bookCategoryIdList, List<Long> bookFormatCategoryIdList, BookLetter bookLetter){
+        // 카테고리 1
+        List<BookCategory> bookCategoryList = Optional.ofNullable(bookCategoryIdList)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(categoryId -> {
+                    return bookCategoryRepository.findById(categoryId).orElseThrow(()->new BookLetterCategoryHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+                }).collect(Collectors.toList());
+        List<BookLetterCategory> bookLetterCategoryList = BookLetterConverter.toBookLetterCategory1(bookCategoryList, bookLetter);
+
+        // 카테고리 2
+        List<BookFormatCategory> bookFormatCategoryList = Optional.ofNullable(bookFormatCategoryIdList)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(categoryId -> {
+                    return bookFormatCategoryRepository.findById(categoryId).orElseThrow(()->new BookLetterCategoryHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+                }).collect(Collectors.toList());
+        List<BookLetterCategory> bookLetterFormatCategoryList = BookLetterConverter.toBookLetterCategory2(bookFormatCategoryList, bookLetter);
+
+        // 카테고리 합치고 저장
+        List<BookLetterCategory> allCategoryList = Stream.concat(bookLetterCategoryList.stream(), bookLetterFormatCategoryList.stream())
+                .collect(Collectors.toList());
+
+        bookLetterCategoryRepository.saveAll(allCategoryList);
     }
 
     // 북레터 수정
@@ -74,11 +115,7 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
             throw new BookLetterHandler(ErrorStatus.BOOKLETTER_BOOKLIST_LIMIT_EXCEEDED);
         }
 
-        bookLetter.setTitle(request.getTitle());
-        bookLetter.setSubtitle(request.getSubtitle());
-        bookLetter.setEditor(request.getEditor());
-        bookLetter.setContent(request.getContent());
-        bookLetter.setCoverImg(request.getCoverImg());
+        bookLetter.setBookLetterContens(request.getTitle(), request.getSubtitle(), request.getEditor(), request.getContent(), request.getCoverImg());
         bookLetterRepository.save(bookLetter);
 
         List<BookLetterBook> bookLetterBooks=bookLetter.getBooks();
@@ -88,6 +125,11 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
         bookLetterBooks.get(3).setBook(books.get(3));
         bookLetterBooks.get(4).setBook(books.get(4));
         bookLetterBookRepository.saveAll(bookLetterBooks);
+
+        // 북레터 카테고리 삭제
+        bookLetterCategoryRepository.deleteByBookLetter(bookLetter);
+        // 북레터 카테고리 저장
+        saveCategory(request.getCategoryIdList1(), request.getCategortIDList2(),bookLetter);
 
         return bookLetter;
     }

@@ -1,10 +1,13 @@
 package com.umc.ttt.domain.bookLetter.Converter;
 
 import com.umc.ttt.domain.book.entity.Book;
+import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.book.entity.BookFormatCategory;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterRequestDTO;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterResponseDTO;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
+import com.umc.ttt.domain.bookLetter.entity.BookLetterCategory;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -33,6 +36,26 @@ public class BookLetterConverter {
                     return BookLetterBook.builder()
                             .bookLetter(bookLetter)
                             .book(book)
+                            .build();
+                }).collect(Collectors.toList());
+    }
+
+    public static List<BookLetterCategory> toBookLetterCategory1(List<BookCategory> bookCategories, BookLetter bookLetter){
+        return bookCategories.stream()
+                .map(bookCategory -> {
+                    return BookLetterCategory.builder()
+                            .bookLetter(bookLetter)
+                            .bookCategory(bookCategory)
+                            .build();
+                }).collect(Collectors.toList());
+    }
+
+    public static List<BookLetterCategory> toBookLetterCategory2(List<BookFormatCategory> bookFormatCategories, BookLetter bookLetter){
+        return bookFormatCategories.stream()
+                .map(bookCategory -> {
+                    return BookLetterCategory.builder()
+                            .bookLetter(bookLetter)
+                            .bookFormatCategory(bookCategory)
                             .build();
                 }).collect(Collectors.toList());
     }
