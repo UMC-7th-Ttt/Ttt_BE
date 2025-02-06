@@ -28,7 +28,10 @@ public interface MemberCommandService {
 
     Member saveProfile(MemberAddProfileDTO memberProfileDTO, MultipartFile profilePicture) throws Exception;
 
-    Member updateInfo(Member member, MemberUpdateInfoDTO memberUpdateInfoDTO) throws Exception;
+    Member updateProfile(Member member, String nickname, MultipartFile profilePicture) throws Exception;
+
+    void updatePassWord(Member member, String password) throws Exception;
 
     void validatePassword(Member member, String password) throws Exception;
+
 }

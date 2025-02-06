@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -71,6 +72,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**").permitAll() // 정적 리소스 허용
                         .requestMatchers("/api/sign-up", "/api/login").permitAll() // 회원가입 접근 허용
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // ✅ POST 요청만 허용
                         .requestMatchers(allowedUrls).permitAll() // 추가 허용된 경로
                         .anyRequest().authenticated() // 기타 요청은 인증 필요
                 )

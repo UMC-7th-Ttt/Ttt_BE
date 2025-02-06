@@ -15,7 +15,6 @@ import com.umc.ttt.domain.member.entity.enums.ProviderType;
 import com.umc.ttt.domain.member.entity.enums.Role;
 import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.domain.member.repository.MemberRepository;
-import com.umc.ttt.domain.place.entity.enums.PlaceCategory;
 import com.umc.ttt.domain.scrap.entity.ScrapFolder;
 import com.umc.ttt.domain.scrap.repository.ScrapFolderRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
@@ -257,7 +256,6 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         String pictureUrl = s3Manager.uploadFile(s3Manager.generateProfileKeyName(savedUuid) + "." + getFileExtension(profilePicture.getOriginalFilename()), profilePicture);
 
         member.setProfileUrl(pictureUrl);
-        member.setRole(Role.USER);
         // 변경된 회원 정보 저장
         memberRepository.save(member);
 
@@ -265,25 +263,39 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
-    public Member updateInfo(Member member, MemberUpdateInfoDTO memberUpdateInfoDTO) throws Exception {
+    public Member updateProfile(Member member, String nickname, MultipartFile profilePicture) throws Exception {
         // 닉네임이 제공된 경우 업데이트
-        if (memberUpdateInfoDTO.getNickname() != null) {
-            member.setNickname(memberUpdateInfoDTO.getNickname());
+        log.info(nickname);
+        if (nickname != null) {
+            member.setNickname(nickname);
         }
 
         // 프로필 URL이 제공된 경우 업데이트
-        if (memberUpdateInfoDTO.getProfileUrl() != null) {
-            member.setProfileUrl(memberUpdateInfoDTO.getProfileUrl());
-        }
+        if (profilePicture != null) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
 
-        if (memberUpdateInfoDTO.getPassword() != null){
-            member.setPassword(memberUpdateInfoDTO.getPassword());
-            member.passwordEncode(passwordEncoder);
+            String pictureUrl = s3Manager.uploadFile(s3Manager.generateProfileKeyName(savedUuid) + "." + getFileExtension(profilePicture.getOriginalFilename()), profilePicture);
+
+            //원래 이미지 삭제
+            s3Manager.deleteFile(member.getProfileUrl());
+            
+            member.setProfileUrl(pictureUrl);
         }
         // 변경된 회원 정보 저장
         memberRepository.save(member);
 
         return member;
+    }
+    @Override
+    public void updatePassWord(Member member, String password) throws Exception {
+        if (password != null){
+            member.setPassword(password);
+            member.passwordEncode(passwordEncoder);
+        }
+        // 변경된 회원 정보 저장
+        memberRepository.save(member);
     }
 
     @Override

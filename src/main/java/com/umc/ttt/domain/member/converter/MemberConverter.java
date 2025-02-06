@@ -22,8 +22,8 @@ public class MemberConverter {
                 .build();
     }
 
-    public static MemberResponseDTO.MemberProfileDTO toMemberProfileDTO(Member member) {
-        return MemberResponseDTO.MemberProfileDTO.builder()
+    public static MemberResponseDTO.MemberProfileDTO2 toMemberProfileDTO(Member member) {
+        return MemberResponseDTO.MemberProfileDTO2.builder()
                 .createdAt(member.getCreatedAt())
                 .id(member.getId())
                 .nickname(member.getNickname())
