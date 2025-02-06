@@ -13,6 +13,7 @@ import java.util.List;
 public interface ReviewCommandService {
     Review addReview(ReviewRequestDTO.AddUpdateDto request, Member member);
     Review updateReview(Long reviewId, ReviewRequestDTO.AddUpdateDto request, Member member);
+    void deleteReview(Long reviewId);
     List<Review> getReviewCalendar(int year, int month, Member member);
     ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member);
     Review getReviewInfo(Long reviewId);

@@ -131,6 +131,7 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     }
 
     @Override
+    @Transactional
     public Review updateReview(Long reviewId, ReviewRequestDTO.AddUpdateDto request, Member member) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
 
@@ -173,6 +174,21 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         }
 
         return review;
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        if(review.getBook()!=null){
+            updateBookRanking(review.getBook(), 0.0);
+        }
+        if(review.getPlace()!=null){
+            updatePlaceRanking(review.getPlace(), 0.0);
+        }
+
+        reviewRepository.delete(review);
     }
 
     // 서평 캘린더 보기

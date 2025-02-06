@@ -38,6 +38,14 @@ public class ReviewRestController {
         return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
     }
 
+    @DeleteMapping("/{reviewId}")
+    @Operation(summary = "서평 삭제", description = "서평을 삭제하는 API입니다.")
+    public ApiResponse<Void> deleteReview(@PathVariable(name = "reviewId") Long reviewId){
+        reviewCommandService.deleteReview(reviewId);
+        return ApiResponse.onSuccess(null);
+    }
+
+
     @GetMapping("/calendar")
     @Operation(summary = "서평 보기-캘린더",description = "캘린더로 작성한 서평을 조회하는 API입니다.")
     public ApiResponse<ReviewResponseDTO.reviewCalendarListDTO> viewCalendarReview(@RequestParam int year, @RequestParam int month, @CurrentMember Member member) {
