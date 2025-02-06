@@ -58,26 +58,24 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
 
         // 공간에 대한 리뷰가 있을 경우, 해당 공간의 평점 계산 후 업데이트
         if (place != null) {
-            updatePlaceRanking(place, request.getPlaceRanking());
+            updatePlaceRanking(place);
         }
         // 도서에 대한 리뷰가 있을 경우, 해당 도서의 평점 계산 후 업데이트
         if (book != null) {
-            updateBookRanking(book, request.getBookRanking());
+            updateBookRanking(book);
         }
 
         return reviewRepository.save(review);
     }
 
     // 장소 리뷰 계산
-    private void updatePlaceRanking(Place place, double placeRanking){
+    private void updatePlaceRanking(Place place){
         List<Review> placeReviews = reviewRepository.findAllByPlace(place);
 
         // 평점 평균 계산
-        double averageRating = Stream.concat(
-                        placeReviews.stream().mapToDouble(Review::getPlaceRanking).boxed(), // 기존 리뷰들의 평점
-                        Stream.of(placeRanking) // 현재 리뷰의 평점
-                )
-                .mapToDouble(Double::doubleValue)
+        double averageRating = placeReviews.stream()
+                .mapToDouble(Review::getPlaceRanking)
+                .filter(rating -> rating > 0.0)
                 .average()
                 .orElse(0.0); // 평점이 없으면 0.0으로 처리
 
@@ -86,15 +84,13 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     }
 
     // 도서 리뷰 계산
-    private void updateBookRanking(Book book, double bookRanking){
+    private void updateBookRanking(Book book){
         List<Review> bookReviews = reviewRepository.findAllByBook(book);
 
         // 평점 평균 계산
-        double averageBookRating = Stream.concat(
-                        bookReviews.stream().mapToDouble(Review::getBookRanking).boxed(), // 기존 리뷰들의 평점
-                        Stream.of(bookRanking) // 현재 리뷰의 평점
-                )
-                .mapToDouble(Double::doubleValue)
+        double averageBookRating = bookReviews.stream()
+                .mapToDouble(Review::getBookRanking)
+                .filter(rating -> rating > 0.0)
                 .average()
                 .orElse(0.0); // 평점이 없으면 0.0으로 처리
 
@@ -160,17 +156,17 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         reviewRepository.save(review);
 
         if(removeBook != null){
-            updateBookRanking(removeBook, 0.0);
+            updateBookRanking(removeBook);
         }
         if(updateBook != null){
-            updateBookRanking(updateBook, request.getBookRanking());
+            updateBookRanking(updateBook);
         }
 
         if(removePlace != null){
-            updatePlaceRanking(removePlace, 0.0);
+            updatePlaceRanking(removePlace);
         }
         if(updatePlace != null){
-            updatePlaceRanking(updatePlace, request.getPlaceRanking());
+            updatePlaceRanking(updatePlace);
         }
 
         return review;
@@ -181,14 +177,14 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
 
+        reviewRepository.delete(review);
+
         if(review.getBook()!=null){
-            updateBookRanking(review.getBook(), 0.0);
+            updateBookRanking(review.getBook());
         }
         if(review.getPlace()!=null){
-            updatePlaceRanking(review.getPlace(), 0.0);
+            updatePlaceRanking(review.getPlace());
         }
-
-        reviewRepository.delete(review);
     }
 
     // 서평 캘린더 보기
