@@ -1,6 +1,6 @@
 package com.umc.ttt.domain.mail.service;
 
-import com.umc.ttt.domain.mail.handler.EMailHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.EMailHandler;
 import jakarta.mail.internet.MimeMessage;
 
 public interface MailService {

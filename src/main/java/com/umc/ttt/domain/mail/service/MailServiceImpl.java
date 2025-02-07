@@ -1,6 +1,6 @@
 package com.umc.ttt.domain.mail.service;
 
-import com.umc.ttt.domain.mail.handler.EMailHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.EMailHandler;
 import com.umc.ttt.domain.member.repository.MemberRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.redis.RedisService;
@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 1) 주어진 이메일 주소에 대해 6자리 인증 코드를 생성하고 verificationCodes 맵에 저장한다. {이메일 : 인증코드} 형태로 저장될 것이다.

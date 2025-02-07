@@ -1,4 +1,4 @@
-package com.umc.ttt.domain.bookLetter.Converter;
+package com.umc.ttt.domain.bookLetter.converter;
 
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;

@@ -1,4 +1,4 @@
-package com.umc.ttt.domain.bookLetter.bookLetterRepository;
+package com.umc.ttt.domain.bookLetter.repository;
 
 import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.entity.BookFormatCategory;

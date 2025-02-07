@@ -1,6 +1,6 @@
-package com.umc.ttt.domain.bookLetter.Controller;
+package com.umc.ttt.domain.bookLetter.controller;
 
-import com.umc.ttt.domain.bookLetter.Converter.BookLetterConverter;
+import com.umc.ttt.domain.bookLetter.converter.BookLetterConverter;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterRequestDTO;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterResponseDTO;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;

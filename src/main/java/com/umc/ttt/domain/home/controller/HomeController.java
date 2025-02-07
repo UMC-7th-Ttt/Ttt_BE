@@ -1,10 +1,10 @@
-package com.umc.ttt.home.controller;
+package com.umc.ttt.domain.home.controller;
 
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.annotation.CurrentMember;
 import com.umc.ttt.global.apiPayload.ApiResponse;
-import com.umc.ttt.home.dto.HomeResponseDTO;
-import com.umc.ttt.home.service.HomeService;
+import com.umc.ttt.domain.home.dto.HomeResponseDTO;
+import com.umc.ttt.domain.home.service.HomeService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

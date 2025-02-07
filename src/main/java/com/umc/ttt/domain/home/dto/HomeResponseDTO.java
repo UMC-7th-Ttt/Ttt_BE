@@ -1,4 +1,4 @@
-package com.umc.ttt.home.dto;
+package com.umc.ttt.domain.home.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -9,13 +9,13 @@ import com.umc.ttt.domain.review.converter.ReviewConverter;
 import com.umc.ttt.domain.review.dto.ReviewRequestDTO;
 import com.umc.ttt.domain.review.dto.ReviewResponseDTO;
 import com.umc.ttt.domain.review.entity.Review;
-import com.umc.ttt.domain.review.handler.ReviewHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.ReviewHandler;
 import com.umc.ttt.domain.review.repository.ReviewRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.PlaceHandler;
-import com.umc.ttt.home.converter.HomeConverter;
-import com.umc.ttt.home.dto.HomeResponseDTO;
+import com.umc.ttt.domain.home.converter.HomeConverter;
+import com.umc.ttt.domain.home.dto.HomeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
