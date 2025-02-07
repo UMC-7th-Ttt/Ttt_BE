@@ -80,7 +80,8 @@ public class BookClubResponseDTO {
         Long bookClubId;
         LocalDate startDate;
         LocalDate endDate;
-        Long recuitNumber;
+        Long participantCount;
+        String comment;
         BookResponseDTO.GetBookDetailResultDTO bookInfo;
     }
 

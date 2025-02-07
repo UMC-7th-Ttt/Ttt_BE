@@ -83,7 +83,8 @@ public class BookClubConverter {
                 .bookClubId(bookClub.getId())
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
-                .recuitNumber(numberOfMember)
+                .participantCount(numberOfMember)
+                .comment(bookClub.getComment())
                 .bookInfo(getBookDetailResultDTO)
                 .build();
     }
