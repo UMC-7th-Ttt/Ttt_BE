@@ -16,7 +16,7 @@ public interface BookClubMemberRepository extends JpaRepository<BookClubMember, 
 
     boolean existsByBookClubAndMember(BookClub bookClub, Member member);
 
-    Long countByBookClubId(Long bookClubId);
+    int countByBookClubId(Long bookClubId);
 
     @Query("SELECT bcm FROM BookClub bc " +
             "JOIN BookClubMember bcm ON bc.id = bcm.bookClub.id " +

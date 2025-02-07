@@ -56,17 +56,22 @@ public class Review extends BaseEntity {
         this.content = content;
     }
 
+    public void setWriteDate(LocalDate writeDate) {
+        this.writeDate = writeDate;
+    }
+
+    public void setBookReview(double bookRanking, Book book) {
+        this.bookRanking = bookRanking;
+        this.book = book;
+    }
+
+    public void setPlaceReview(double placeRanking, Place place) {
+        this.placeRanking = placeRanking;
+        this.place = place;
+    }
+
     public void setIsSecret(boolean isSecret) {
         this.isSecret = isSecret;
     }
 
-    public void setBook(Book book, double bookRanking) {
-        this.book = book;
-        this.bookRanking = bookRanking;
-    }
-
-    public void setPlace(Place place, double placeRanking) {
-        this.place = place;
-        this.placeRanking = placeRanking;
-    }
 }

@@ -22,12 +22,29 @@ import java.util.List;
 public class ReviewRestController {
     private final ReviewCommandService reviewCommandService;
 
-    @PutMapping("/")
-    @Operation(summary = "서평 작성 및 수정",description = "작성한 서평을 저장 및 수정하는 API입니다.")
-    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> add(@RequestBody @Valid ReviewRequestDTO.AddUpdateDto request, @CurrentMember Member member) {
+    @PostMapping("/")
+    @Operation(summary = "서평 작성",description = "작성한 서평을 저장하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> addReview(@RequestBody @Valid ReviewRequestDTO.AddUpdateDto request, @CurrentMember Member member) {
         Review review = reviewCommandService.addReview(request, member);
         return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
     }
+
+    @PatchMapping("/{reviewId}")
+    @Operation(summary = "서평 수정", description = "서평을 수정하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> updateReview(@PathVariable(name = "reviewId") Long reviewId,
+                                                                          @RequestBody @Valid ReviewRequestDTO.AddUpdateDto request,
+                                                                          @CurrentMember Member member) {
+        Review review = reviewCommandService.updateReview(reviewId, request, member);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
+    @DeleteMapping("/{reviewId}")
+    @Operation(summary = "서평 삭제", description = "서평을 삭제하는 API입니다.")
+    public ApiResponse<Void> deleteReview(@PathVariable(name = "reviewId") Long reviewId){
+        reviewCommandService.deleteReview(reviewId);
+        return ApiResponse.onSuccess(null);
+    }
+
 
     @GetMapping("/calendar")
     @Operation(summary = "서평 보기-캘린더",description = "캘린더로 작성한 서평을 조회하는 API입니다.")

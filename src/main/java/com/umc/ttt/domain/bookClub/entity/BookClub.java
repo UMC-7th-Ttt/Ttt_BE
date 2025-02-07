@@ -30,6 +30,9 @@ public class BookClub extends BaseEntity {
     @Column(nullable = false)
     private String comment; // 한줄 추천 멘트
 
+    @Column(nullable = false)
+    private int participantCount;   // 참여 현황
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="book_letter_book_id", nullable = true)
     private BookLetterBook bookLetterBook;
@@ -42,5 +45,9 @@ public class BookClub extends BaseEntity {
 
     public void setBookLetterBook(BookLetterBook bookLetterBook){
         this.bookLetterBook = bookLetterBook;
+    }
+
+    public void setParticipantCount(int participantCount){
+        this.participantCount = participantCount;
     }
 }

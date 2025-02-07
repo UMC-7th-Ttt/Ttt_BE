@@ -10,7 +10,6 @@ import java.util.List;
 
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
@@ -45,5 +44,16 @@ public class BookLetter extends BaseEntity {
 
     @OneToMany(mappedBy = "bookLetter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookLetterBook> books = new ArrayList<>();
+
+    public void setBookLetterContents(String title, String subTitle, String editor, String content) {
+        this.title = title;
+        this.subtitle = subTitle;
+        this.editor = editor;
+        this.content = content;
+    }
+
+    public void setBookLetterCoverImg(String coverImg) {
+        this.coverImg = coverImg;
+    }
 
 }

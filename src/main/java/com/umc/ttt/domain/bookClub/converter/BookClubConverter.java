@@ -52,7 +52,7 @@ public class BookClubConverter {
     }
 
     // 북레터 상세 보기(관리자)
-    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub, Long numberOfBMember) {
+    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub) {
         return BookClubResponseDTO.BookClubDTOForManager.builder()
                 .bookLetterId(bookClub.getBookLetterBook().getBookLetter().getId())
                 .bookId(bookClub.getBookLetterBook().getBook().getId())
@@ -61,7 +61,7 @@ public class BookClubConverter {
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
                 .comment(bookClub.getComment())
-                .number0fMember(numberOfBMember)
+                .participantCount(bookClub.getParticipantCount())
                 .build();
     }
 
@@ -78,12 +78,12 @@ public class BookClubConverter {
                 .build();
     }
 
-    public static BookClubResponseDTO.getBookClubJoinPageResultDTO toGetBookClubJoinPageResultDTO(BookClub bookClub, BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO, Long numberOfMember) {
+    public static BookClubResponseDTO.getBookClubJoinPageResultDTO toGetBookClubJoinPageResultDTO(BookClub bookClub, BookResponseDTO.GetBookDetailResultDTO getBookDetailResultDTO) {
         return BookClubResponseDTO.getBookClubJoinPageResultDTO.builder()
                 .bookClubId(bookClub.getId())
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
-                .participantCount(numberOfMember)
+                .participantCount(bookClub.getParticipantCount())
                 .comment(bookClub.getComment())
                 .bookInfo(getBookDetailResultDTO)
                 .build();

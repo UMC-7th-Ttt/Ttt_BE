@@ -3,30 +3,42 @@ package com.umc.ttt.domain.bookLetter.service;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.entity.BookFormatCategory;
+import com.umc.ttt.domain.book.repository.BookCategoryRepository;
+import com.umc.ttt.domain.book.repository.BookFormatCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import com.umc.ttt.domain.bookLetter.Converter.BookLetterConverter;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterBookRepository;
+import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterCategoryRepository;
 import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterRepository;
 import com.umc.ttt.domain.bookLetter.dto.BookLetterRequestDTO;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
+import com.umc.ttt.domain.bookLetter.entity.BookLetterCategory;
+import com.umc.ttt.domain.bookLetter.handler.BookLetterCategoryHandler;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.repository.MemberPreferredCategoryRepository;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.handler.BookHandler;
 import com.umc.ttt.global.apiPayload.exception.handler.BookLetterHandler;
+import com.umc.ttt.global.aws.s3.entity.Uuid;
+import com.umc.ttt.global.aws.s3.repository.UuidRepository;
+import com.umc.ttt.global.aws.s3.service.AmazonS3Manager;
 import com.umc.ttt.home.converter.HomeConverter;
 import com.umc.ttt.home.dto.HomeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +47,18 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     private final BookRepository bookRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
     private final MemberPreferredCategoryRepository memberPreferredCategoryRepository;
+    private final BookCategoryRepository bookCategoryRepository;
+    private final BookFormatCategoryRepository bookFormatCategoryRepository;
+    private final BookLetterCategoryRepository bookLetterCategoryRepository;
+
+    private final AmazonS3Manager s3Manager;
+    private final UuidRepository uuidRepository;
+    private final AmazonS3Manager amazonS3Manager;
 
     // 북레터 추가
     @Override
     @Transactional
-    public BookLetter addBookLetter(BookLetterRequestDTO.CRDto request){
+    public BookLetter addBookLetter(BookLetterRequestDTO.CUDto request, MultipartFile bookLetterCover){
         List<Book> books = request.getBooksId().stream()
                 .map(bookId -> {
                     return bookRepository.findById(bookId).orElseThrow(()-> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
@@ -49,19 +68,62 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
             throw new BookLetterHandler(ErrorStatus.BOOKLETTER_BOOKLIST_LIMIT_EXCEEDED);
         }
 
-        BookLetter bookLetter = BookLetterConverter.toBookLetter(request);
+        // 북레터 이미지
+        String pictureUrl = saveBookLetterCoverImg(bookLetterCover);
+
+        // 북레터 저장
+        BookLetter bookLetter = BookLetterConverter.toBookLetter(request, pictureUrl);
         bookLetterRepository.save(bookLetter);
 
         List<BookLetterBook> bookLetterBooks = BookLetterConverter.toBookLetterBook(books,bookLetter);
         bookLetterBookRepository.saveAll(bookLetterBooks);
 
+        // 북레터 카테고리 저장
+        saveCategory(request.getCategoryIdList1(), request.getCategortIDList2(), bookLetter);
+
         return bookLetter;
+    }
+
+    // 북레터 이미지 저장
+    private String saveBookLetterCoverImg(MultipartFile bookLetterCover){
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+
+        return s3Manager.uploadFile(s3Manager.generateBookLetterKeyName(savedUuid), bookLetterCover );
+    }
+
+    // 카테고리들 저장
+    private void saveCategory(List<Long> bookCategoryIdList, List<Long> bookFormatCategoryIdList, BookLetter bookLetter){
+        // 카테고리 1
+        List<BookCategory> bookCategoryList = Optional.ofNullable(bookCategoryIdList)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(categoryId -> {
+                    return bookCategoryRepository.findById(categoryId).orElseThrow(()->new BookLetterCategoryHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+                }).collect(Collectors.toList());
+        List<BookLetterCategory> bookLetterCategoryList = BookLetterConverter.toBookLetterCategory1(bookCategoryList, bookLetter);
+
+        // 카테고리 2
+        List<BookFormatCategory> bookFormatCategoryList = Optional.ofNullable(bookFormatCategoryIdList)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(categoryId -> {
+                    return bookFormatCategoryRepository.findById(categoryId).orElseThrow(()->new BookLetterCategoryHandler(ErrorStatus.CATEGORY_NOT_FOUND));
+                }).collect(Collectors.toList());
+        List<BookLetterCategory> bookLetterFormatCategoryList = BookLetterConverter.toBookLetterCategory2(bookFormatCategoryList, bookLetter);
+
+        // 카테고리 합치고 저장
+        List<BookLetterCategory> allCategoryList = Stream.concat(bookLetterCategoryList.stream(), bookLetterFormatCategoryList.stream())
+                .collect(Collectors.toList());
+
+        bookLetterCategoryRepository.saveAll(allCategoryList);
     }
 
     // 북레터 수정
     @Override
     @Transactional
-    public BookLetter updateBookLetter(Long bookLetterId ,BookLetterRequestDTO.CRDto request){
+    public BookLetter updateBookLetter(Long bookLetterId , BookLetterRequestDTO.CUDto request){
         BookLetter bookLetter = bookLetterRepository.findById(bookLetterId)
                 .orElseThrow(()->new BookLetterHandler(ErrorStatus.BOOKLETTER_NOT_FOUND));
 
@@ -74,11 +136,7 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
             throw new BookLetterHandler(ErrorStatus.BOOKLETTER_BOOKLIST_LIMIT_EXCEEDED);
         }
 
-        bookLetter.setTitle(request.getTitle());
-        bookLetter.setSubtitle(request.getSubtitle());
-        bookLetter.setEditor(request.getEditor());
-        bookLetter.setContent(request.getContent());
-        bookLetter.setCoverImg(request.getCoverImg());
+        bookLetter.setBookLetterContents(request.getTitle(), request.getSubtitle(), request.getEditor(), request.getContent());
         bookLetterRepository.save(bookLetter);
 
         List<BookLetterBook> bookLetterBooks=bookLetter.getBooks();
@@ -89,6 +147,25 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
         bookLetterBooks.get(4).setBook(books.get(4));
         bookLetterBookRepository.saveAll(bookLetterBooks);
 
+        // 북레터 카테고리 삭제
+        bookLetterCategoryRepository.deleteByBookLetter(bookLetter);
+        // 북레터 카테고리 저장
+        saveCategory(request.getCategoryIdList1(), request.getCategortIDList2(),bookLetter);
+
+        return bookLetter;
+    }
+
+    @Override
+    public BookLetter updateBookLetterCover(Long bookLetterId, MultipartFile bookLetterCover) {
+        BookLetter bookLetter = bookLetterRepository.findById(bookLetterId)
+                .orElseThrow(()->new BookLetterHandler(ErrorStatus.BOOKLETTER_NOT_FOUND));
+        if(bookLetter.getCoverImg()!=null){
+            amazonS3Manager.deleteFile(bookLetter.getCoverImg());
+        }
+        String pictureUrl = saveBookLetterCoverImg(bookLetterCover);
+        bookLetter.setBookLetterCoverImg(pictureUrl);
+        bookLetterRepository.save(bookLetter);
+
         return bookLetter;
     }
 
@@ -96,9 +173,12 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     @Override
     @Transactional
     public void deleteBookLetter(Long bookLetterId) {
-        if(!bookLetterRepository.existsById(bookLetterId)){
-            throw new BookLetterHandler(ErrorStatus.BOOKLETTER_NOT_FOUND);
+        BookLetter bookLetter = bookLetterRepository.findById(bookLetterId)
+                .orElseThrow(()->new BookLetterHandler(ErrorStatus.BOOKLETTER_NOT_FOUND));
+        if(bookLetter.getCoverImg()!=null){
+            amazonS3Manager.deleteFile(bookLetter.getCoverImg());
         }
+
         bookLetterRepository.deleteById(bookLetterId);
     }
 
