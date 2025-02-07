@@ -20,13 +20,13 @@ public class BookLetterConverter {
                 .build();
     }
 
-    public static BookLetter toBookLetter(BookLetterRequestDTO.CRDto request) {
+    public static BookLetter toBookLetter(BookLetterRequestDTO.CUDto request, String coverImg) {
         return BookLetter.builder()
                 .title(request.getTitle())
                 .subtitle(request.getSubtitle())
                 .editor(request.getEditor())
                 .content(request.getContent())
-                .coverImg(request.getCoverImg())
+                .coverImg(coverImg)
                 .build();
     }
 

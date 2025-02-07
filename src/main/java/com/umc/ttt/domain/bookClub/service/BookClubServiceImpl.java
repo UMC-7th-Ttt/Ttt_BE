@@ -35,6 +35,7 @@ public class BookClubServiceImpl implements BookClubService{
             throw new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_ALREADY_EXIST);
         }
         BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook);
+        bookClub.setParticipantCount(0);
 
         return bookClubRepository.save(bookClub);
     }
@@ -83,12 +84,6 @@ public class BookClubServiceImpl implements BookClubService{
         return bookClub;
     }
 
-    // 북클럽 현황 가져오기
-    @Override
-    public Long getNumberOfMembers(Long bookClubId) {
-        return bookClubMemberRepository.countByBookClubId(bookClubId);
-    }
-
     @Override
     @Transactional
     public BookClubMember joinBookClub(Long bookClubId, Member member) {
@@ -100,7 +95,12 @@ public class BookClubServiceImpl implements BookClubService{
         }
 
         BookClubMember bookClubMember = BookClubConverter.toJoinBookClub(bookClub, member);
+        bookClubMemberRepository.save(bookClubMember);
 
-        return bookClubMemberRepository.save(bookClubMember);
+        int participantCount = bookClubMemberRepository.countByBookClubId(bookClubId);
+        bookClub.setParticipantCount(participantCount);
+        bookClubRepository.save(bookClub);
+
+        return bookClubMember;
     }
 }
