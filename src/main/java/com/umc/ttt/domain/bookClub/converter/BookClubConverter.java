@@ -84,6 +84,7 @@ public class BookClubConverter {
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
                 .participantCount(bookClub.getParticipantCount())
+                .comment(bookClub.getComment())
                 .bookInfo(getBookDetailResultDTO)
                 .build();
     }

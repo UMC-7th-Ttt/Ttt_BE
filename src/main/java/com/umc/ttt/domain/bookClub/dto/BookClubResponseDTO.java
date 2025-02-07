@@ -81,6 +81,7 @@ public class BookClubResponseDTO {
         LocalDate startDate;
         LocalDate endDate;
         int participantCount;
+        String comment;
         BookResponseDTO.GetBookDetailResultDTO bookInfo;
     }
 

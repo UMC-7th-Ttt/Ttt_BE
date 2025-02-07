@@ -81,6 +81,7 @@ public class BookConverter {
                 .author(book.getAuthor())
                 .category(book.getBookCategory().getCategoryName())
                 .publisher(book.getPublisher())
+                .itemLink(book.getLink())
                 .isScraped(isScraped)
                 .build();
     }
@@ -96,6 +97,7 @@ public class BookConverter {
                 .itemPage(book.getItemPage())
                 .description(book.getDescription())
                 .hasEbook(book.getHasEbook())
+                .itemLink(book.getLink())
                 .isScraped(isScraped)
                 .totalRating(book.getRating())
                 .build();

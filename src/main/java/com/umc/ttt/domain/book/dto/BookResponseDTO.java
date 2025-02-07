@@ -60,6 +60,7 @@ public class BookResponseDTO {
         private String author;
         private String category;
         private String publisher;
+        private String itemLink;
         private boolean isScraped;
     }
 
@@ -78,6 +79,7 @@ public class BookResponseDTO {
         private String description;
         private boolean hasEbook;
         private boolean isScraped;
+        private String itemLink;
         private double userRating;
         private double totalRating;
         private List<ReviewDTO> reviews;
