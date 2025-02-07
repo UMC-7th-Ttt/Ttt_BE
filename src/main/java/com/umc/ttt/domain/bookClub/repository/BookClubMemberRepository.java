@@ -24,4 +24,6 @@ public interface BookClubMemberRepository extends JpaRepository<BookClubMember, 
             "AND bc.startDate <= CURRENT_DATE " +
             "AND bc.endDate >= CURRENT_DATE")
     List<BookClubMember> findActiveBookClubsByMember(Long memberId);
+
+    Optional<BookClubMember> findByMemberAndBookClub(Member member, BookClub bookClub);
 }
