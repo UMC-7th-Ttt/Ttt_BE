@@ -116,4 +116,60 @@ public class BookClubResponseDTO {
         int currentMonth;
         List<bookClubDTO> bookClubs;
     }
+
+    // 책마다 북클럽 홈 화면
+    // 사용자 프로필 사진, 아이디
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getBookClubHomeUserDTO {
+        Long memberId;
+        String profileUrl;
+    }
+
+    // 사용자 인증
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bookClubMemberRecordDTO{
+        Long recordId;
+        String imgUrl; // 인증 사진
+        String nickname;    // 멤버 닉네임
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bookClubMemberRecordListDTO{
+        private List<bookClubMemberRecordDTO> recordList;
+        private Long nextCursor;
+        private int limit;
+        private boolean hasNext;
+    }
+    // 이달의 북클럽
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class monthBookClubDTO{
+        Long bookClubId;
+        Long bookId;
+        String bookTitle;
+        String author;
+        String bookCover;
+        String bookCategory;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getMonthClubListDTO {
+        int currentMonth;
+        List<monthBookClubDTO> bookClubs;
+        private String nextCursorTitle;
+        private int limit;
+        private boolean hasNext;
+    }
 }
