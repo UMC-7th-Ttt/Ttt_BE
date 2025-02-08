@@ -1,6 +1,7 @@
 package com.umc.ttt.domain.bookClub.service;
 
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
+import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.member.entity.Member;
@@ -13,4 +14,5 @@ public interface BookClubService {
     public Page<BookClub> getBookClubPreViewListForManager(Integer page);
     public BookClub getBookClubForManager(Long bookClubId);
     public BookClubMember joinBookClub(Long bookClubId, Member member);
+    public BookClubResponseDTO.getMonthClubListDTO getMonthClubResults(String cursor, int limit);
 }

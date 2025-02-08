@@ -1,13 +1,16 @@
 package com.umc.ttt.domain.bookClub.converter;
 
 import com.umc.ttt.domain.book.dto.BookResponseDTO;
+import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
 import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
+import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
 import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
+import com.umc.ttt.domain.review.converter.ReviewConverter;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -100,6 +103,59 @@ public class BookClubConverter {
         return BookClubResponseDTO.joinBookClubResultDTO.builder()
                 .id(bookClub.getId())
                 .bookClubId(bookClub.getBookClub().getId())
+                .build();
+    }
+
+    // 책마다 북클럽 홈 화면
+    public static BookClubResponseDTO.getBookClubHomeUserDTO toGetBookClubHomeUserDTO(Long memberId, String profileUrl){
+        return BookClubResponseDTO.getBookClubHomeUserDTO.builder()
+                .memberId(memberId)
+                .profileUrl(profileUrl)
+                .build();
+    }
+
+    public static BookClubResponseDTO.bookClubMemberRecordDTO toBookClubMemberRecordDTO(ReadingRecord readingRecord) {
+        return BookClubResponseDTO.bookClubMemberRecordDTO.builder()
+                .recordId(readingRecord.getId())
+                .imgUrl(readingRecord.getImgUrl())
+                .nickname(readingRecord.getBookClubMember().getMember().getNickname())
+                .build();
+    }
+
+    public static BookClubResponseDTO.bookClubMemberRecordListDTO toBookClubMemberRecordListDTO(List<ReadingRecord> records, Long nextCursor, int limit, boolean hasNext){
+        List<BookClubResponseDTO.bookClubMemberRecordDTO> recordListDTO = records.stream()
+                .map(BookClubConverter::toBookClubMemberRecordDTO).collect(Collectors.toList());
+
+        return BookClubResponseDTO.bookClubMemberRecordListDTO.builder()
+                .recordList(recordListDTO)
+                .nextCursor(nextCursor)
+                .limit(limit)
+                .hasNext(hasNext)
+                .build();
+    }
+
+    public static BookClubResponseDTO.monthBookClubDTO toMonthBookClubDTO(BookClub bookClub) {
+        Book book = bookClub.getBookLetterBook().getBook();
+        return BookClubResponseDTO.monthBookClubDTO.builder()
+                .bookClubId(bookClub.getId())
+                .bookId(book.getId())
+                .bookTitle(book.getTitle())
+                .author(book.getAuthor())
+                .bookCover(book.getCover())
+                .bookCategory(book.getBookCategory().getCategoryName())
+                .build();
+    }
+
+    public static BookClubResponseDTO.getMonthClubListDTO toGetMonthClubResultDTO(int currentMonth, List<BookClub> bookClubs, String nextCursorTitle, int limit, boolean hasNext) {
+        List<BookClubResponseDTO.monthBookClubDTO> bookClubListDTO = bookClubs.stream()
+                .map(BookClubConverter::toMonthBookClubDTO).collect(Collectors.toList());
+
+        return BookClubResponseDTO.getMonthClubListDTO.builder()
+                .currentMonth(currentMonth)
+                .bookClubs(bookClubListDTO)
+                .nextCursorTitle(nextCursorTitle)
+                .limit(limit)
+                .hasNext(hasNext)
                 .build();
     }
 }

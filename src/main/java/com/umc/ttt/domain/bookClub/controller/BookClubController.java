@@ -7,6 +7,7 @@ import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.service.BookClubQueryService;
 import com.umc.ttt.domain.bookClub.service.BookClubService;
+import com.umc.ttt.domain.bookClub.service.ReadingRecordService;
 import com.umc.ttt.domain.bookLetter.validation.annotataion.CheckPage;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.repository.MemberRepository;
@@ -25,6 +26,7 @@ public class BookClubController {
     private final BookClubService bookClubService;
     private final BookClubQueryService bookClubQueryService;
     private final MemberRepository memberRepository;
+    private final ReadingRecordService readingRecordService;
 
     @PostMapping("/")
     @Operation(summary = "책마다 북클럽 작성(관리자)",description = "책마다 북클럽을 저장하는 API입니다.")
@@ -83,5 +85,33 @@ public class BookClubController {
                                                                                @CurrentMember Member member) {
         BookClubMember bookClubMember = bookClubService.joinBookClub(bookClubId, member);
         return ApiResponse.onSuccess(BookClubConverter.toJoinBookClubResultDTO(bookClubMember));
+    }
+
+    @GetMapping("/home")
+    @Operation(summary = "책마다 북클럽 홈 화면(유저 아이디, 프로필) - ",description = "책마다 북클럽 홈 화면 - 유저 아이디, 프로필 조회하는 API입니다.")
+    public ApiResponse<BookClubResponseDTO.getBookClubHomeUserDTO> getBookClubHomeUser(@CurrentMember Member member) {
+        return ApiResponse.onSuccess(BookClubConverter.toGetBookClubHomeUserDTO(member.getId(),member.getProfileUrl()));
+    }
+
+    @GetMapping("/home/readingRecord")
+    @Operation(summary = "책마다 북클럽 홈 화면 (다른 회원들의 북클럽 인증들)",description = "책마다 북클럽 홈 화면 - 다른 회원들의 북클럽 인증들을 조회하는 API입니다.\n\n" +
+            "첫 페이지 조회 시 cursor 값으로 0을 전달해주세요.\n\n" +
+            "첫 페이지가 아닌 경우 이전 응답의 hasNext가 true일 때, nextCursor 값을 cursor로 전달해주세요.")
+    public ApiResponse<BookClubResponseDTO.bookClubMemberRecordListDTO> getBookClubRecordList(@RequestParam(name = "cursor", defaultValue = "0") Long cursor,
+                                                                                     @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                                                                     @CurrentMember Member member) {
+        BookClubResponseDTO.bookClubMemberRecordListDTO response = readingRecordService.getBookClubMemberRecords(cursor, limit, member);
+        return ApiResponse.onSuccess(response);
+    }
+
+    @GetMapping("/home/bookClubs")
+    @Operation(summary = "책마다 북클럽 (이달의 책마다 북클럽)",description = "책마다 북클럽 홈 화면 - 이달의 책마다 북클럽들을 조회하는 API입니다.\n\n" +
+            "첫 페이지 조회 시 cursor 값으로 ㄱ을 전달해주세요.\n\n" +
+            "커서 값은 <<<<<책 제목>>>>>입니다\n\n" +
+            "첫 페이지가 아닌 경우 이전 응답의 hasNext가 true일 때, nextCursor 값을 cursor로 전달해주세요.")
+    public ApiResponse<BookClubResponseDTO.getMonthClubListDTO> getMonthBookClubList(@RequestParam(name = "cursorTitle", defaultValue = "ㄱ") String cursorTitle,
+                                                                                            @RequestParam(name = "limit", defaultValue = "10") int limit) {
+        BookClubResponseDTO.getMonthClubListDTO response = bookClubService.getMonthClubResults(cursorTitle, limit);
+        return ApiResponse.onSuccess(response);
     }
 }
