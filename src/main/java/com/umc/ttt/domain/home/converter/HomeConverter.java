@@ -1,10 +1,10 @@
-package com.umc.ttt.home.converter;
+package com.umc.ttt.domain.home.converter;
 
 import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
 import com.umc.ttt.domain.review.entity.Review;
-import com.umc.ttt.home.dto.HomeResponseDTO;
+import com.umc.ttt.domain.home.dto.HomeResponseDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;

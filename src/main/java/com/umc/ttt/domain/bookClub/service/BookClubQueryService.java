@@ -2,7 +2,7 @@ package com.umc.ttt.domain.bookClub.service;
 
 import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
-import com.umc.ttt.home.dto.HomeResponseDTO;
+import com.umc.ttt.domain.home.dto.HomeResponseDTO;
 
 import java.util.List;
 

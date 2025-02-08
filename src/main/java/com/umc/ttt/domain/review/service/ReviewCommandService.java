@@ -1,12 +1,10 @@
 package com.umc.ttt.domain.review.service;
 
-import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.member.entity.Member;
-import com.umc.ttt.domain.place.entity.Place;
 import com.umc.ttt.domain.review.dto.ReviewRequestDTO;
 import com.umc.ttt.domain.review.dto.ReviewResponseDTO;
 import com.umc.ttt.domain.review.entity.Review;
-import com.umc.ttt.home.dto.HomeResponseDTO;
+import com.umc.ttt.domain.home.dto.HomeResponseDTO;
 
 import java.util.List;
 

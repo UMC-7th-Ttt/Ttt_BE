@@ -93,4 +93,27 @@ public class BookClubResponseDTO {
         Long id;
         Long bookClubId;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bookClubDTO {
+        Long bookClubId;
+        Long bookId;
+        String bookTitle;
+        String bookAuthor;
+        String bookCategory;
+        String bookCover;
+        Integer completionRate;  // 완독률
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class bookClubListDTO {
+        int currentMonth;
+        List<bookClubDTO> bookClubs;
+    }
 }

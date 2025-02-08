@@ -102,4 +102,17 @@ public class BookClubConverter {
                 .bookClubId(bookClub.getBookClub().getId())
                 .build();
     }
+
+    public static BookClubResponseDTO.bookClubDTO toBookClubDTO(BookClub bookClub, int completionRate) {
+        return BookClubResponseDTO.bookClubDTO.builder()
+                .bookClubId(bookClub.getId())
+                .bookId(bookClub.getBookLetterBook().getId())
+                .bookTitle(bookClub.getBookLetterBook().getBook().getTitle())
+                .bookAuthor(bookClub.getBookLetterBook().getBook().getAuthor())
+                .bookCategory(bookClub.getBookLetterBook().getBook().getBookCategory().getCategoryName())
+                .bookCover(bookClub.getBookLetterBook().getBook().getCover())
+                .completionRate(completionRate)
+                .build();
+    }
+
 }

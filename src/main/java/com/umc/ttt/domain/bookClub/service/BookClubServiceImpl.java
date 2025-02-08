@@ -2,14 +2,17 @@ package com.umc.ttt.domain.bookClub.service;
 
 import com.umc.ttt.domain.bookClub.converter.BookClubConverter;
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
+import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
 import com.umc.ttt.domain.bookClub.entity.BookClubMember;
-import com.umc.ttt.domain.bookClub.handler.BookClubHandler;
+import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
+import com.umc.ttt.global.apiPayload.exception.handler.BookClubHandler;
 import com.umc.ttt.domain.bookClub.repository.BookClubMemberRepository;
 import com.umc.ttt.domain.bookClub.repository.BookClubRepository;
-import com.umc.ttt.domain.bookLetter.bookLetterRepository.BookLetterBookRepository;
+import com.umc.ttt.domain.bookClub.repository.ReadingRecordRepository;
+import com.umc.ttt.domain.bookLetter.repository.BookLetterBookRepository;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
-import com.umc.ttt.domain.bookLetter.handler.BookLetterBookHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.BookLetterBookHandler;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +21,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class BookClubServiceImpl implements BookClubService{
     private final BookClubRepository bookClubRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
     private final BookClubMemberRepository bookClubMemberRepository;
+    private final ReadingRecordRepository readingRecordRepository;
 
     @Override
     @Transactional
@@ -102,5 +113,40 @@ public class BookClubServiceImpl implements BookClubService{
         bookClubRepository.save(bookClub);
 
         return bookClubMember;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BookClubResponseDTO.bookClubListDTO myBookClubs(Member member) {
+        LocalDate now = LocalDate.now();
+        LocalDate endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth());
+
+        List<BookClub> bookClubs = bookClubRepository.findMyBookClubs(member, now, endOfMonth);
+
+        List<BookClubResponseDTO.bookClubDTO> bookClubDTOs = bookClubs.stream()
+                .map(bookClub -> {
+                    BookClubMember bookClubMember = bookClubMemberRepository.findByMemberAndBookClub(member, bookClub)
+                            .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
+
+                    List<ReadingRecord> readingRecords = readingRecordRepository.findByBookClubMember(bookClubMember);
+
+                    // 가장 최근 참여 인증
+                    Optional<ReadingRecord> latestReadingRecord = readingRecords.stream()
+                            .max(Comparator.comparing(ReadingRecord::getCreatedAt));
+
+                    // 완독률 계산
+                    int completionRate = latestReadingRecord
+                            .map(record -> calculateUserCompletionRate(record.getCurrentPage(), bookClub.getBookLetterBook().getBook().getItemPage()))
+                            .orElse(0);
+
+                    return BookClubConverter.toBookClubDTO(bookClub, completionRate);
+                })
+                .collect(Collectors.toList());
+
+        return new BookClubResponseDTO.bookClubListDTO(now.getMonthValue(), bookClubDTOs);
+    }
+
+    public int calculateUserCompletionRate(int userReadPages, int bookTotalPages) {
+        return (int) (((double) userReadPages / bookTotalPages) * 100);
     }
 }

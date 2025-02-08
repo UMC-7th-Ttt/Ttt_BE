@@ -7,7 +7,7 @@ import com.umc.ttt.domain.bookClub.entity.BookClubMember;
 import com.umc.ttt.domain.bookClub.entity.Comment;
 import com.umc.ttt.domain.bookClub.entity.CommentLike;
 import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
-import com.umc.ttt.domain.bookClub.handler.BookClubHandler;
+import com.umc.ttt.global.apiPayload.exception.handler.BookClubHandler;
 import com.umc.ttt.domain.bookClub.repository.BookClubMemberRepository;
 import com.umc.ttt.domain.bookClub.repository.CommentLikeRepository;
 import com.umc.ttt.domain.bookClub.repository.CommentRepository;

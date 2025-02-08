@@ -84,4 +84,10 @@ public class BookClubController {
         BookClubMember bookClubMember = bookClubService.joinBookClub(bookClubId, member);
         return ApiResponse.onSuccess(BookClubConverter.toJoinBookClubResultDTO(bookClubMember));
     }
+
+    @GetMapping("/members")
+    @Operation(summary = "책마다 북클럽 참여현황", description = "책마다 북클럽 참여현황 API입니다.")
+    public ApiResponse<BookClubResponseDTO.bookClubListDTO> myBookClubs(@CurrentMember Member member) {
+        return ApiResponse.onSuccess(bookClubService.myBookClubs(member));
+    }
 }

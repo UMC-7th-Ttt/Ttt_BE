@@ -1,4 +1,4 @@
-package com.umc.ttt.domain.mail.handler;
+package com.umc.ttt.global.apiPayload.exception.handler;
 
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import com.umc.ttt.global.apiPayload.exception.GeneralException;
