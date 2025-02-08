@@ -22,12 +22,13 @@ public class BookClubConverter {
                 .build();
     }
 
-    public static BookClub toBookClub(BookClubRequestDTO.AddUpdateDTO request, BookLetterBook bookLetterBook) {
+    public static BookClub toBookClub(BookClubRequestDTO.AddUpdateDTO request, BookLetterBook bookLetterBook, Member member) {
         return BookClub.builder()
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .comment(request.getComment())
                 .bookLetterBook(bookLetterBook)
+                .writerMember(member)
                 .build();
     }
 
@@ -54,12 +55,14 @@ public class BookClubConverter {
     }
 
     // 북레터 상세 보기(관리자)
-    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub) {
+    public static BookClubResponseDTO.BookClubDTOForManager toBookClubDTOForManager(BookClub bookClub, Member member) {
+        boolean isWriter = bookClub.getWriterMember().equals(member);
+
         return BookClubResponseDTO.BookClubDTOForManager.builder()
                 .bookLetterId(bookClub.getBookLetterBook().getBookLetter().getId())
                 .bookId(bookClub.getBookLetterBook().getBook().getId())
                 .title(bookClub.getBookLetterBook().getBook().getTitle())
-                .isWriter(true) // 추후 writer인지 확인
+                .isWriter(isWriter)
                 .startDate(bookClub.getStartDate())
                 .endDate(bookClub.getEndDate())
                 .comment(bookClub.getComment())

@@ -58,7 +58,7 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
     // 북레터 추가
     @Override
     @Transactional
-    public BookLetter addBookLetter(BookLetterRequestDTO.CUDto request, MultipartFile bookLetterCover){
+    public BookLetter addBookLetter(BookLetterRequestDTO.CUDto request, MultipartFile bookLetterCover, Member member){
         List<Book> books = request.getBooksId().stream()
                 .map(bookId -> {
                     return bookRepository.findById(bookId).orElseThrow(()-> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
@@ -72,7 +72,7 @@ public class BookLetterCommandServiceImpl implements BookLetterCommandService {
         String pictureUrl = saveBookLetterCoverImg(bookLetterCover);
 
         // 북레터 저장
-        BookLetter bookLetter = BookLetterConverter.toBookLetter(request, pictureUrl);
+        BookLetter bookLetter = BookLetterConverter.toBookLetter(request, pictureUrl, member);
         bookLetterRepository.save(bookLetter);
 
         List<BookLetterBook> bookLetterBooks = BookLetterConverter.toBookLetterBook(books,bookLetter);

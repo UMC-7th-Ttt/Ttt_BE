@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/sign-up", "/api/login").permitAll() // 회원가입 접근 허용
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // ✅ POST 요청만 허용
                         .requestMatchers(allowedUrls).permitAll() // 추가 허용된 경로
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자만 허용된 경로
                         .anyRequest().authenticated() // 기타 요청은 인증 필요
                 )
 

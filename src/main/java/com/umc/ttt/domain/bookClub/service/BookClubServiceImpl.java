@@ -40,14 +40,14 @@ public class BookClubServiceImpl implements BookClubService{
 
     @Override
     @Transactional
-    public BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request) {
+    public BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request, Member member) {
         BookLetterBook bookLetterBook = bookLetterBookRepository.findById(request.getBookLetterBookId()).orElseThrow(() -> new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_NOT_FOUND));
 
         boolean existBookClub = bookClubRepository.existsByBookLetterBookId(request.getBookLetterBookId());
         if(existBookClub) {
             throw new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_ALREADY_EXIST);
         }
-        BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook);
+        BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook, member);
         bookClub.setParticipantCount(0);
 
         return bookClubRepository.save(bookClub);

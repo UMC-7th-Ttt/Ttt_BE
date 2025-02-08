@@ -8,7 +8,7 @@ import com.umc.ttt.domain.member.entity.Member;
 import org.springframework.data.domain.Page;
 
 public interface BookClubService {
-    BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request);
+    BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request, Member member);
     BookClub updateBookClub(Long bookClubId, BookClubRequestDTO.AddUpdateDTO request);
     void deleteBookClub(Long bookClubId);
     Page<BookClub> getBookClubPreViewListForManager(Integer page);

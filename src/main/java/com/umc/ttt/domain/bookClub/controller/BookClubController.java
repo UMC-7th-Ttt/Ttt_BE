@@ -27,41 +27,6 @@ public class BookClubController {
     private final BookClubQueryService bookClubQueryService;
     private final ReadingRecordService readingRecordService;
 
-    @PostMapping("/")
-    @Operation(summary = "책마다 북클럽 작성(관리자)",description = "책마다 북클럽을 저장하는 API입니다.")
-    public ApiResponse<BookClubResponseDTO.AddUpdateResultDTO> add(@RequestBody @Valid BookClubRequestDTO.AddUpdateDTO request) {
-        BookClub bookClub = bookClubService.addBookClub(request);
-        return ApiResponse.onSuccess(BookClubConverter.addUpdateResultDTO(bookClub));
-    }
-
-    @PatchMapping("/{bookClubId}")
-    @Operation(summary = "책마다 북클럽 수정(관리자)",description = "책마다 북클럽을 수정하는 API입니다.")
-    public ApiResponse<BookClubResponseDTO.AddUpdateResultDTO> update(@PathVariable(name="bookClubId") Long bookClubId, @RequestBody @Valid BookClubRequestDTO.AddUpdateDTO request) {
-        BookClub bookClub = bookClubService.updateBookClub(bookClubId,request);
-        return ApiResponse.onSuccess(BookClubConverter.addUpdateResultDTO(bookClub));
-    }
-
-    @DeleteMapping("/{bookClubId}")
-    @Operation(summary = "책마다 북클럽 삭제(관리자)",description = "책마다 북클럽을 삭제하는 API입니다.")
-    public ApiResponse<Void> deleteBookClub(@PathVariable(name="bookClubId") Long bookClubId){
-        bookClubService.deleteBookClub(bookClubId);
-        return ApiResponse.onSuccess(null);
-    }
-
-    @GetMapping("/")
-    @Operation(summary = "책마다 북클럽 리스트 조회(관리자)",description = "책마다 북클럽 리스트를 조회하는 API입니다.")
-    public ApiResponse<BookClubResponseDTO.BookClubListDTOForManager> getBookClubPreviewListForManager(@CheckPage @RequestParam(name="page",defaultValue = "1")Integer page){
-        Page<BookClub> bookClubList = bookClubService.getBookClubPreViewListForManager(page-1);
-        return ApiResponse.onSuccess(BookClubConverter.bookClubListDTOForManager(bookClubList));
-    }
-
-    @GetMapping("/{bookClubId}")
-    @Operation(summary = "책마다 북클럽 상세 조회(관리자)",description = "특정 책마다 북클럽의 상세 정보를 조회하는 API입니다.")
-    public ApiResponse<BookClubResponseDTO.BookClubDTOForManager> getBookClubForManager(@PathVariable(name="bookClubId") Long bookClubId){
-        BookClub bookClub = bookClubService.getBookClubForManager(bookClubId);
-        return ApiResponse.onSuccess(BookClubConverter.toBookClubDTOForManager(bookClub));
-    }
-
     @GetMapping("/{bookClubId}/details")
     @Operation(summary = "책마다 북클럽 상세 페이지 조회",description = "책마다 북클럽 상세 페이지를 조회하는 API입니다. 책 정보, 사용자 및 권장 완독률, 멤버 리스트를 제공합니다.")
     public ApiResponse<BookClubResponseDTO.getBookClubDetailsResultDTO> getBookClubDetails(@PathVariable(name="bookClubId") Long bookClubId,
