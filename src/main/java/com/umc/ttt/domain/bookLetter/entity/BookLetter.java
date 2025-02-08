@@ -40,7 +40,7 @@ public class BookLetter extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member editorMember;  // 에디터 멤버
 
     @OneToMany(mappedBy = "bookLetter", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookLetterBook> books = new ArrayList<>();

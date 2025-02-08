@@ -1,6 +1,8 @@
 package com.umc.ttt.domain.bookClub.service;
 
+import com.umc.ttt.domain.bookClub.converter.BookClubConverter;
 import com.umc.ttt.domain.bookClub.converter.ReadingRecordConverter;
+import com.umc.ttt.domain.bookClub.dto.BookClubResponseDTO;
 import com.umc.ttt.domain.bookClub.dto.ReadingRecordRequestDTO;
 import com.umc.ttt.domain.bookClub.dto.ReadingRecordResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.BookClub;
@@ -15,7 +17,11 @@ import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,5 +90,15 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
         MemberResponseDTO.MemberInfoDTO memberInfoDTO = MemberConverter.toMemberInfoDTO(member);
 
         return ReadingRecordConverter.toGetReadingRecordResultDTO(readingRecord, memberInfoDTO);
+    }
+
+    // 북클럽 인증 사진들
+    @Override
+    @Transactional(readOnly = true)
+    public BookClubResponseDTO.bookClubMemberRecordListDTO getBookClubMemberRecords(Long cursor, int limit, Member member) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Slice<ReadingRecord> records = readingRecordRepository.findReadingRecordsWithCursor(member.getId(), cursor, pageable);
+        Long nextCursor = records.hasNext()?records.getContent().get(records.getContent().size()-1).getId() : null;
+        return BookClubConverter.toBookClubMemberRecordListDTO(records.getContent(), nextCursor, limit, records.hasNext());
     }
 }

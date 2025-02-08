@@ -1,8 +1,8 @@
 package com.umc.ttt.domain.bookClub.entity;
 
 import com.umc.ttt.domain.bookClub.dto.BookClubRequestDTO;
-import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.bookLetter.entity.BookLetterBook;
+import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +32,10 @@ public class BookClub extends BaseEntity {
 
     @Column(nullable = false)
     private int participantCount;   // 참여 현황
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member writerMember;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="book_letter_book_id", nullable = true)

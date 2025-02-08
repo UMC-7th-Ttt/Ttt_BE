@@ -18,6 +18,8 @@ import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,14 +40,14 @@ public class BookClubServiceImpl implements BookClubService{
 
     @Override
     @Transactional
-    public BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request) {
+    public BookClub addBookClub(BookClubRequestDTO.AddUpdateDTO request, Member member) {
         BookLetterBook bookLetterBook = bookLetterBookRepository.findById(request.getBookLetterBookId()).orElseThrow(() -> new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_NOT_FOUND));
 
         boolean existBookClub = bookClubRepository.existsByBookLetterBookId(request.getBookLetterBookId());
         if(existBookClub) {
             throw new BookLetterBookHandler(ErrorStatus.BOOK_LETTER_BOOK_ALREADY_EXIST);
         }
-        BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook);
+        BookClub bookClub = BookClubConverter.toBookClub(request, bookLetterBook, member);
         bookClub.setParticipantCount(0);
 
         return bookClubRepository.save(bookClub);
@@ -148,5 +150,21 @@ public class BookClubServiceImpl implements BookClubService{
 
     public int calculateUserCompletionRate(int userReadPages, int bookTotalPages) {
         return (int) (((double) userReadPages / bookTotalPages) * 100);
+    }
+
+    // 이달의 북클럽
+    @Override
+    @Transactional(readOnly = true)
+    public BookClubResponseDTO.getMonthClubListDTO getMonthClubResults(String cursor, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int month = today.getMonthValue();
+        if(cursor.equals("ㄱ")){
+            cursor = null;
+        }
+        Slice<BookClub> bookClubs = bookClubRepository.findBookClubsWithCursor(year, month, cursor, pageable);
+        String nextCursor = bookClubs.hasNext() ? bookClubs.getContent().get(bookClubs.getContent().size()-1).getBookLetterBook().getBook().getTitle() : null;
+        return BookClubConverter.toGetMonthClubResultDTO(month, bookClubs.getContent(), nextCursor, limit,bookClubs.hasNext());
     }
 }

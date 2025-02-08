@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface BookLetterCommandService {
-    BookLetter addBookLetter(BookLetterRequestDTO.CUDto request, MultipartFile bookLetterCover);
+    BookLetter addBookLetter(BookLetterRequestDTO.CUDto request, MultipartFile bookLetterCover, Member member);
     BookLetter updateBookLetter(Long bookLetterId , BookLetterRequestDTO.CUDto request);
     BookLetter updateBookLetterCover(Long bookLetterId, MultipartFile bookLetterCover);
     void deleteBookLetter(Long bookLetterId);
