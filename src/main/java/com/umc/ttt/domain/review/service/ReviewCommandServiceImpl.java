@@ -228,9 +228,9 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
     // 홈화면 서평 가져오기 (랜덤 5개)
     @Override
     @Transactional(readOnly = true)
-    public List<HomeResponseDTO.remindReviewDTO> getRandomReviewsByYear() {
+    public List<HomeResponseDTO.remindReviewDTO> getRandomReviewsByYear(Member member) {
         Pageable limit = PageRequest.of(0,5);
-        List<Review> reviews = reviewRepository.findRandomReviewByYear(limit);
+        List<Review> reviews = reviewRepository.findRandomReviewByYearAndMember(limit, member);
 
         return reviews.stream()
                 .map(HomeConverter::toRemindReviewDTO).collect(Collectors.toList());

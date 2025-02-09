@@ -62,6 +62,7 @@ public class HomeResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class remindReviewDTO {
+        Long reviewId;
         Long bookId;
         String bookTitle;
         String bookCover;
