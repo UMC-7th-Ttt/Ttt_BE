@@ -42,16 +42,10 @@ public class GoogleIdTokenVerify {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
-        log.info("googleIdToken1" + idToken);
 
         GoogleIdToken googleIdToken = verifier.verify(idToken);
 
-        log.info("googleIdToken2" + googleIdToken);
-
-        try{
             if (googleIdToken != null) {
-                log.info("googleIdToken" + googleIdToken);
-
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
                 String userId = payload.getSubject();
                 String email = payload.getEmail();
@@ -74,25 +68,21 @@ public class GoogleIdTokenVerify {
 
                 userDetails.put("accessToken", accessToken);
                 userDetails.put("member", createdUser);
+
                 return userDetails;
             } else {
                 throw new IllegalArgumentException("Invalid ID token.");
             }
-        }catch (OAuth2AuthenticationException e) {
-            log.error("Google ID Token verification failed: {}", e.getMessage());
-        }
-        return null;
     }
 
     private Member getUser(Map<String, Object> userDetails) throws MemberHandler {
-
         Member findMember = memberRepository.findByEmail((String) userDetails.get("email"))
                 .orElse(null);
 
         if(findMember == null) {
             return saveUser(userDetails);//회원가입.
         }else if(findMember.getProviderType().equals(ProviderType.EMAIL)) {
-            throw new OAuth2AuthenticationException(ErrorStatus.MEMBER_ALREADY_EXISTS.getCode());
+            throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_EXISTS);
         }
 
         //로그인의 경우
