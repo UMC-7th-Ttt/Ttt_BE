@@ -29,11 +29,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     """)
     List<Book> findBooksByKeyword(String keyword, long cursor, Pageable pageable);
 
-    @Query("SELECT b FROM Book b WHERE b.bookCategory IN :categories")
-    List<Book> findBooksByCategories(List<BookCategory> categories);
+    @Query("SELECT b FROM Book b WHERE b.bookCategory.id IN :categoryIds")
+    List<Book> findBooksByCategory(List<Long> categoryIds);
 
     @Query("SELECT b FROM Book b WHERE b.bookCategory.categoryName IN :bookCategoryNames")
     List<Book> findBooksByBookCategoryNames(List<String> bookCategoryNames);
+
+    @Query("SELECT b FROM Book b WHERE b.itemPage BETWEEN :minPage AND :maxPage")
+    List<Book> findBooksByPageCount(int minPage, int maxPage);
 
     Optional<Book> findBookById(Long bookId);
 }

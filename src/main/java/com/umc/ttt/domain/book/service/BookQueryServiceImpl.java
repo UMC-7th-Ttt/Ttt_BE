@@ -112,34 +112,59 @@ public class BookQueryServiceImpl implements BookQueryService {
                         }
                 ));
 
-        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, randomBooks);
 
         return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
     }
 
     @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member) {
-        List<BookCategory> preferredCategories = member.getPreferredCategories().stream()
-                .map(MemberPreferredCategory::getBookCategory)
-                .collect(Collectors.toList());
+        List<MemberPreferredCategory> preferredCategories = member.getPreferredCategories();
 
         if (preferredCategories.isEmpty()) {
             throw new BookHandler(ErrorStatus.MEMBER_PREFERRED_CATEGORY_NOT_FOUND);
         }
 
-        List<Book> books = bookRepository.findBooksByCategories(preferredCategories);
+        List<Long> categoryIds = new ArrayList<>();
+        List<Long> formatCategoryIds = new ArrayList<>();
+
+        for (MemberPreferredCategory mpc : preferredCategories) {
+            if (mpc.getBookCategory() != null) {
+                categoryIds.add(mpc.getBookCategory().getId());
+            }
+            if (mpc.getBookFormatCategory() != null) {
+                formatCategoryIds.add(mpc.getBookFormatCategory().getId());
+            }
+        }
+
+        List<Book> filteredBooks = new ArrayList<>();
+
+        if (!categoryIds.isEmpty()) {
+            filteredBooks.addAll(bookRepository.findBooksByCategory(categoryIds));
+        }
+
+        List<Book> formatFilteredBooks = new ArrayList<>();
+
+        for (Long formatId : formatCategoryIds) {
+            if (formatId == 1) { // 200 페이지 미만
+                formatFilteredBooks.addAll(bookRepository.findBooksByPageCount(0, 200));
+            } else if (formatId == 2) { // 200 페이지 이상
+                formatFilteredBooks.addAll(bookRepository.findBooksByPageCount(200, Integer.MAX_VALUE));
+            }
+        }
+
+        // bookCategory와 formatCategory 겹치는 경우만 남기기
+        if (!categoryIds.isEmpty() && !formatCategoryIds.isEmpty()) {
+            filteredBooks.retainAll(formatFilteredBooks);
+        } else if (formatCategoryIds.isEmpty()) {
+            filteredBooks = formatFilteredBooks;
+        }
 
         // 최대 10권을 랜덤으로 선택
-        List<Book> randomBooks = books.stream()
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        collected -> {
-                            Collections.shuffle(collected);
-                            return collected.stream().limit(10).toList();
-                        }
-                ));
+        Collections.shuffle(filteredBooks);
+        List<Book> randomBooks = filteredBooks.stream().limit(10).toList();
 
-        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
+        List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, randomBooks);
 
         return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
     }
