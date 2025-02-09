@@ -42,16 +42,10 @@ public class GoogleIdTokenVerify {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
-        log.info("googleIdToken1" + idToken);
 
         GoogleIdToken googleIdToken = verifier.verify(idToken);
 
-        log.info("googleIdToken2" + googleIdToken);
-
-//        try{
             if (googleIdToken != null) {
-                log.info("googleIdToken" + googleIdToken);
-
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
                 String userId = payload.getSubject();
                 String email = payload.getEmail();
@@ -67,8 +61,6 @@ public class GoogleIdTokenVerify {
                 userDetails.put("pictureUrl", pictureUrl);
                 log.info(name);
 
-                log.info("userDetails1"+ userDetails);
-
                 Member createdUser = getUser(userDetails); // getUser() 메소드로 User 객체 생성 후 반환
                 GeneratedToken generatedToken = jwtService.generateToken(email);
 
@@ -81,20 +73,13 @@ public class GoogleIdTokenVerify {
             } else {
                 throw new IllegalArgumentException("Invalid ID token.");
             }
-//        }catch (Exception e) {
-//            log.error("Google ID Token verification failed: {}", e.getMessage());
-//        }
-//        return null;
     }
 
     private Member getUser(Map<String, Object> userDetails) throws MemberHandler {
-        log.info("userDetails2"+ userDetails);
-
         Member findMember = memberRepository.findByEmail((String) userDetails.get("email"))
                 .orElse(null);
 
         if(findMember == null) {
-            log.info("userDetails3"+ userDetails);
             return saveUser(userDetails);//회원가입.
         }else if(findMember.getProviderType().equals(ProviderType.EMAIL)) {
             throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_EXISTS);
