@@ -48,7 +48,7 @@ public class GoogleIdTokenVerify {
 
         log.info("googleIdToken2" + googleIdToken);
 
-        try{
+//        try{
             if (googleIdToken != null) {
                 log.info("googleIdToken" + googleIdToken);
 
@@ -67,6 +67,8 @@ public class GoogleIdTokenVerify {
                 userDetails.put("pictureUrl", pictureUrl);
                 log.info(name);
 
+                log.info("userDetails1"+ userDetails);
+
                 Member createdUser = getUser(userDetails); // getUser() 메소드로 User 객체 생성 후 반환
                 GeneratedToken generatedToken = jwtService.generateToken(email);
 
@@ -74,25 +76,28 @@ public class GoogleIdTokenVerify {
 
                 userDetails.put("accessToken", accessToken);
                 userDetails.put("member", createdUser);
+
                 return userDetails;
             } else {
                 throw new IllegalArgumentException("Invalid ID token.");
             }
-        }catch (OAuth2AuthenticationException e) {
-            log.error("Google ID Token verification failed: {}", e.getMessage());
-        }
-        return null;
+//        }catch (Exception e) {
+//            log.error("Google ID Token verification failed: {}", e.getMessage());
+//        }
+//        return null;
     }
 
     private Member getUser(Map<String, Object> userDetails) throws MemberHandler {
+        log.info("userDetails2"+ userDetails);
 
         Member findMember = memberRepository.findByEmail((String) userDetails.get("email"))
                 .orElse(null);
 
         if(findMember == null) {
+            log.info("userDetails3"+ userDetails);
             return saveUser(userDetails);//회원가입.
         }else if(findMember.getProviderType().equals(ProviderType.EMAIL)) {
-            throw new OAuth2AuthenticationException(ErrorStatus.MEMBER_ALREADY_EXISTS.getCode());
+            throw new MemberHandler(ErrorStatus.MEMBER_ALREADY_EXISTS);
         }
 
         //로그인의 경우
