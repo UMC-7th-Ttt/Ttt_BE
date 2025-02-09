@@ -5,6 +5,9 @@ import com.umc.ttt.domain.book.dto.BookResponseDTO;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
 import com.umc.ttt.domain.book.repository.BookRepository;
+import com.umc.ttt.domain.bookLetter.entity.BookLetter;
+import com.umc.ttt.domain.bookLetter.repository.BookLetterBookRepository;
+import com.umc.ttt.domain.bookLetter.repository.BookLetterRepository;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.member.entity.MemberPreferredCategory;
 import com.umc.ttt.domain.member.repository.MemberRepository;
@@ -29,6 +32,8 @@ public class BookQueryServiceImpl implements BookQueryService {
     private final BookScrapRepository bookScrapRepository;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
+    private final BookLetterRepository bookLetterRepository;
+    private final BookLetterBookRepository bookLetterBookRepository;
 
     @Override
     public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member) {
@@ -141,13 +146,10 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public BookResponseDTO.SuggestBooksResultDTO suggestBooksByEditor(Member member) {
-        // TODO: 에디터 픽으로 변경
-        List<String> titles = Arrays.asList("이처럼 사소한 것들", "급류", "서랍에 저녁을 넣어 두었다 - 2024 노벨문학상 수상작가", "희랍어 시간 - 2024 노벨문학상 수상작가", "너의 유토피아");
+        BookLetter randomBookLetter = bookLetterRepository.findRandomBookLetter()
+                .orElseThrow(() -> new BookHandler(ErrorStatus.BOOKLETTER_NOT_FOUND));
 
-        List<Book> books = titles.stream()
-                .map(bookRepository::findBookByTitle)
-                .flatMap(Optional::stream)
-                .toList();
+        List<Book> books = bookLetterBookRepository.findByBookLetterId(randomBookLetter.getId());
 
         List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
 
