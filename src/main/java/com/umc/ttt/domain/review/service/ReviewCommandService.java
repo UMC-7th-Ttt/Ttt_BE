@@ -15,5 +15,5 @@ public interface ReviewCommandService {
     List<Review> getReviewCalendar(int year, int month, Member member);
     ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member);
     Review getReviewInfo(Long reviewId);
-    List<HomeResponseDTO.remindReviewDTO> getRandomReviewsByYear();
+    List<HomeResponseDTO.remindReviewDTO> getRandomReviewsByYear(Member member);
 }

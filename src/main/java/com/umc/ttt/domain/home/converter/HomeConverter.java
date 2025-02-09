@@ -55,6 +55,7 @@ public class HomeConverter {
 //    리마인드 (독서평)
     public static HomeResponseDTO.remindReviewDTO toRemindReviewDTO(Review review) {
         return HomeResponseDTO.remindReviewDTO.builder()
+                .reviewId(review.getId())
                 .bookId(review.getBook().getId())
                 .bookTitle(review.getBook().getTitle())
                 .bookCover(review.getBook().getCover())

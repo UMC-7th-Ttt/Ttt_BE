@@ -35,7 +35,7 @@ public class HomeServiceImpl implements HomeService{
         List<HomeResponseDTO.recommendBookLetterDTO> recommentBookLetterDTOList = bookLetterCommandService.getRecommendBookLetters(member);
 
         // 리마인드 (독서평)
-        List<HomeResponseDTO.remindReviewDTO> remindReviewDTOList = reviewCommandService.getRandomReviewsByYear();
+        List<HomeResponseDTO.remindReviewDTO> remindReviewDTOList = reviewCommandService.getRandomReviewsByYear(member);
 
         return HomeConverter.toViewHomeResultDTO(nickName, profileUrl , recentBookLetterDTOList, activeBookClubDTOList, recommentBookLetterDTOList, remindReviewDTOList);
     }
