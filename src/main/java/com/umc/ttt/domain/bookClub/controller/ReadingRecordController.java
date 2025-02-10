@@ -31,7 +31,7 @@ public class ReadingRecordController {
     @GetMapping
     @Operation(summary = "책마다 북클럽 서평 인증 목록 조회", description = "책마다 북클럽 서평 인증 목록 조회 API입니다.")
     public ApiResponse<ReadingRecordResponseDTO.GetReadingRecordListResultDTO> getReadingRecordList(@CurrentMember Member member) {
-        ReadingRecordResponseDTO.GetReadingRecordListResultDTO readingRecord = readingRecordService.getReadingRecordList();
+        ReadingRecordResponseDTO.GetReadingRecordListResultDTO readingRecord = readingRecordService.getReadingRecordList(member);
         return ApiResponse.onSuccess(readingRecord);
     }
 

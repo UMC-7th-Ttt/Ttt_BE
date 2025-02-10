@@ -9,7 +9,7 @@ import com.umc.ttt.domain.member.entity.Member;
 public interface ReadingRecordService {
     public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, Member member);
 
-    public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList();
+    public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList(Member member);
 
     public ReadingRecordResponseDTO.GetReadingRecordResultDTO getReadingRecord(Long readingRecordId);
 

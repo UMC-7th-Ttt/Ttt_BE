@@ -23,6 +23,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,9 +49,21 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
     }
 
     @Override
-    public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList() {
-        // 가장 최근에 생성된 인증 10개 조회
-        List<ReadingRecord> readingRecords = readingRecordRepository.findTop10ByOrderByCreatedAtDesc();
+    public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList(Member member) {
+        // 사용자가 가입한 북클럽 목록 가져오기
+        List<BookClubMember> bookClubMembers = bookClubMemberRepository.findByMember(member);
+
+        if (bookClubMembers.isEmpty()) {
+            return new ReadingRecordResponseDTO.GetReadingRecordListResultDTO(Collections.emptyList());
+        }
+
+        List<Long> bookClubIds = bookClubMembers.stream()
+                .map(bookClubMember -> bookClubMember.getBookClub().getId())
+                .collect(Collectors.toList());
+
+        // 해당 북클럽들에서 생성된 가장 최근 인증 10개 조회
+        Pageable pageable = PageRequest.of(0, 10);
+        List<ReadingRecord> readingRecords = readingRecordRepository.findRecent10ByBookClubIds(bookClubIds, pageable);
 
         if (readingRecords.isEmpty()) {
             throw new BookClubHandler(ErrorStatus.READING_RECORD_NOT_FOUND);
@@ -62,12 +75,12 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
                 throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB);
             }
 
-            Member member = bookClubMember.getMember();
-            if (member == null) {
+            Member recordOwner = bookClubMember.getMember();
+            if (recordOwner == null) {
                 throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND);
             }
 
-            return ReadingRecordConverter.toReadingRecordDTO(readingRecord, member);
+            return ReadingRecordConverter.toReadingRecordDTO(readingRecord, recordOwner);
         }).collect(Collectors.toList());
 
         return new ReadingRecordResponseDTO.GetReadingRecordListResultDTO(readingRecordDTOs);
@@ -83,11 +96,11 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
             throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB);
         }
 
-        Member member = bookClubMember.getMember();
-        if (member == null) {
+        Member recordOwner = bookClubMember.getMember();
+        if (recordOwner == null) {
             throw new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND);
         }
-        MemberResponseDTO.MemberInfoDTO memberInfoDTO = MemberConverter.toMemberInfoDTO(member);
+        MemberResponseDTO.MemberInfoDTO memberInfoDTO = MemberConverter.toMemberInfoDTO(recordOwner);
 
         return ReadingRecordConverter.toGetReadingRecordResultDTO(readingRecord, memberInfoDTO);
     }
