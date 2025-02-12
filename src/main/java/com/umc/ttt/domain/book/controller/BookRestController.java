@@ -73,23 +73,23 @@ public class BookRestController {
     @Parameters({
             @Parameter(name = "categoryName", description = "카테고리 이름")
     })
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByBookCategory(@RequestParam(value = "categoryName", required = true) String categoryName,
-                                                                                         @CurrentMember Member member) {
-        BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksByBookCategory(categoryName, member);
+    public ApiResponse<BookResponseDTO.SuggestBooksByBookCategoryResultDTO> suggestBooksByBookCategory(@RequestParam(value = "categoryName", required = true) String categoryName,
+                                                                                                       @CurrentMember Member member) {
+        BookResponseDTO.SuggestBooksByBookCategoryResultDTO books = bookQueryService.suggestBooksByBookCategory(categoryName, member);
         return ApiResponse.onSuccess(books);
     }
 
     @GetMapping("/search/user-suggestions")
     @Operation(summary = "책 사용자별 추천 검색어 조회", description = "책 사용자별 추천 검색어 조회 API이며, 사용자의 취향 키워드를 기반으로 추천됩니다.")
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksForUser(@CurrentMember Member member) {
-        BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksForUser(member);
+    public ApiResponse<BookResponseDTO.SuggestBooksForUserResultDTO> suggestBooksForUser(@CurrentMember Member member) {
+        BookResponseDTO.SuggestBooksForUserResultDTO books = bookQueryService.suggestBooksForUser(member);
         return ApiResponse.onSuccess(books);
     }
 
     @GetMapping("/search/editor-pick")
     @Operation(summary = "책 에디터 픽 추천 검색어 조회", description = "에디터 픽 추천 검색어 조회 API이며, 책 5권을 반환합니다.")
-    public ApiResponse<BookResponseDTO.SuggestBooksResultDTO> suggestBooksByEditor(@CurrentMember Member member) {
-        BookResponseDTO.SuggestBooksResultDTO books = bookQueryService.suggestBooksByEditor(member);
+    public ApiResponse<BookResponseDTO.SuggestBooksByEditorResultDTO> suggestBooksByEditor(@CurrentMember Member member) {
+        BookResponseDTO.SuggestBooksByEditorResultDTO books = bookQueryService.suggestBooksByEditor(member);
         return ApiResponse.onSuccess(books);
     }
 

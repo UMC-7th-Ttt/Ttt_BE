@@ -89,7 +89,7 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
+    public BookResponseDTO.SuggestBooksByBookCategoryResultDTO suggestBooksByBookCategory(String categoryName, Member member) {
         // 카테고리 매핑 정의
         Map<String, List<String>> categoryMapping = Map.of(
                 "koreanLiterature", Arrays.asList("판타지", "미스터리", "로맨스", "소설", "시"),
@@ -120,11 +120,11 @@ public class BookQueryServiceImpl implements BookQueryService {
 
         List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, randomBooks);
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
+        return BookConverter.toSuggestBooksByBookCategoryResultDTO(randomBooks, scrapedBookIds);
     }
 
     @Override
-    public BookResponseDTO.SuggestBooksResultDTO suggestBooksForUser(Member member) {
+    public BookResponseDTO.SuggestBooksForUserResultDTO suggestBooksForUser(Member member) {
         List<MemberPreferredCategory> preferredCategories = member.getPreferredCategories();
 
         if (preferredCategories.isEmpty()) {
@@ -172,11 +172,11 @@ public class BookQueryServiceImpl implements BookQueryService {
 
         List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, randomBooks);
 
-        return BookConverter.toSuggestBooksResultDTO(randomBooks, scrapedBookIds);
+        return BookConverter.toSuggestBooksForUserResultDTO(randomBooks, scrapedBookIds, member);
     }
 
     @Override
-    public BookResponseDTO.SuggestBooksResultDTO suggestBooksByEditor(Member member) {
+    public BookResponseDTO.SuggestBooksByEditorResultDTO suggestBooksByEditor(Member member) {
         BookLetter randomBookLetter = bookLetterRepository.findRandomBookLetter()
                 .orElseThrow(() -> new BookHandler(ErrorStatus.BOOKLETTER_NOT_FOUND));
 
@@ -184,7 +184,7 @@ public class BookQueryServiceImpl implements BookQueryService {
 
         List<Long> scrapedBookIds = bookScrapRepository.findScrapedBookIdsByMemberAndBooks(member, books);
 
-        return BookConverter.toSuggestBooksResultDTO(books, scrapedBookIds);
+        return BookConverter.toSuggestBooksByEditorResultDTO(books, scrapedBookIds, randomBookLetter);
     }
 
     @Override
