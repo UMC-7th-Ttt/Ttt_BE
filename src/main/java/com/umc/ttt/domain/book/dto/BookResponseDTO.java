@@ -45,7 +45,25 @@ public class BookResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SuggestBooksResultDTO {
+    public static class SuggestBooksByBookCategoryResultDTO {
+        private List<BookInfoDTO> books;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SuggestBooksForUserResultDTO {
+        private String memberNickname;
+        private List<BookInfoDTO> books;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SuggestBooksByEditorResultDTO {
+        private String bookLetterTitle;
         private List<BookInfoDTO> books;
     }
 

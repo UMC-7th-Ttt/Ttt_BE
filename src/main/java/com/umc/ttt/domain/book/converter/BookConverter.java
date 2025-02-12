@@ -4,7 +4,9 @@ import com.umc.ttt.domain.book.dto.BookFetchDTO;
 import com.umc.ttt.domain.book.dto.BookResponseDTO;
 import com.umc.ttt.domain.book.entity.Book;
 import com.umc.ttt.domain.book.entity.BookCategory;
+import com.umc.ttt.domain.bookLetter.entity.BookLetter;
 import com.umc.ttt.domain.member.converter.MemberConverter;
+import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.domain.review.entity.Review;
 
 import java.util.List;
@@ -63,12 +65,34 @@ public class BookConverter {
                 .build();
     }
 
-    public static BookResponseDTO.SuggestBooksResultDTO toSuggestBooksResultDTO(List<Book> books, List<Long> scrapedBookIds) {
+    public static BookResponseDTO.SuggestBooksByBookCategoryResultDTO toSuggestBooksByBookCategoryResultDTO(List<Book> books, List<Long> scrapedBookIds) {
         List<BookResponseDTO.BookInfoDTO> bookInfoList = books.stream()
                 .map(book -> toBookInfoDTO(book, scrapedBookIds.contains(book.getId())))
                 .collect(Collectors.toList());
 
-        return BookResponseDTO.SuggestBooksResultDTO.builder()
+        return BookResponseDTO.SuggestBooksByBookCategoryResultDTO.builder()
+                .books(bookInfoList)
+                .build();
+    }
+
+    public static BookResponseDTO.SuggestBooksForUserResultDTO toSuggestBooksForUserResultDTO(List<Book> books, List<Long> scrapedBookIds, Member member) {
+        List<BookResponseDTO.BookInfoDTO> bookInfoList = books.stream()
+                .map(book -> toBookInfoDTO(book, scrapedBookIds.contains(book.getId())))
+                .collect(Collectors.toList());
+
+        return BookResponseDTO.SuggestBooksForUserResultDTO.builder()
+                .memberNickname(member.getNickname())
+                .books(bookInfoList)
+                .build();
+    }
+
+    public static BookResponseDTO.SuggestBooksByEditorResultDTO toSuggestBooksByEditorResultDTO(List<Book> books, List<Long> scrapedBookIds, BookLetter bookLetter) {
+        List<BookResponseDTO.BookInfoDTO> bookInfoList = books.stream()
+                .map(book -> toBookInfoDTO(book, scrapedBookIds.contains(book.getId())))
+                .collect(Collectors.toList());
+
+        return BookResponseDTO.SuggestBooksByEditorResultDTO.builder()
+                .bookLetterTitle(bookLetter.getTitle())
                 .books(bookInfoList)
                 .build();
     }
