@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +35,9 @@ public class BookQueryServiceImpl implements BookQueryService {
     private final ReviewRepository reviewRepository;
     private final BookLetterRepository bookLetterRepository;
     private final BookLetterBookRepository bookLetterBookRepository;
+
+    private final AtomicReference<BookResponseDTO.SuggestBookQuotesDTO> cachedBookQuote = new AtomicReference<>();
+    private final Random random = new Random();
 
     @Override
     public BookResponseDTO.SearchBookResultDTO searchBooks(String keyword, long cursor, int limit, Member member) {
@@ -58,28 +62,30 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public BookResponseDTO.GetBestSellersResultDTO getBestSellers(Member member) {
-        // TODO: 배스트셀러로 변경
-        List<String> titles = Arrays.asList("이처럼 사소한 것들", "급류", "서랍에 저녁을 넣어 두었다 - 2024 노벨문학상 수상작가", "희랍어 시간 - 2024 노벨문학상 수상작가", "너의 유토피아", "대온실 수리 보고서");
+        List<Long> bookIds = List.of(11L, 215L, 302L, 372L, 454L, 828L);
 
-        List<Book> books = titles.stream()
-                .map(bookRepository::findBookByTitle)
+        List<Book> books = bookIds.stream()
+                .map(id -> bookRepository.findBookById(id))
                 .flatMap(Optional::stream)
-                .toList();
+                .collect(Collectors.toList());
 
         return BookConverter.toGetBestSellersResultDTO(books);
+    }
 
-//        List<Book> books = bookRepository.findAll();
-//
-//        // bestRank가 1~5인 책 필터링
-//        List<Book> filteredBooks = books.stream()
-//                .filter(book -> book.getBestRank() >= 1 && book.getBestRank() <= 5)
-//                .collect(Collectors.toList());
-//
-//        // 최대 5권을 랜덤으로 선택
-//        Collections.shuffle(filteredBooks);
-//        List<Book> selectedBooks = filteredBooks.stream().limit(5).collect(Collectors.toList());
-//
-//        return BookConverter.toGetBestSellersResultDTO(selectedBooks);
+    @Override
+    public BookResponseDTO.SuggestBookQuotesDTO suggestBookQuotes(Member member) {
+        return cachedBookQuote.get();
+    }
+
+    // 랜덤으로 책을 선택하여 캐싱
+    public void updateRandomBookQuote() {
+        List<Long> bookIds = List.of(11L, 215L, 302L, 372L, 454L, 828L);
+        Long randomBookId = bookIds.get(random.nextInt(bookIds.size()));
+
+        Book book = bookRepository.findBookById(randomBookId)
+                .orElseThrow(() -> new BookHandler(ErrorStatus.BOOK_NOT_FOUND));
+
+        cachedBookQuote.set(BookConverter.toSuggestBookQuotesDTO(book));
     }
 
     @Override
