@@ -8,6 +8,8 @@ public interface BookQueryService {
 
     BookResponseDTO.GetBestSellersResultDTO getBestSellers(Member member);
 
+    BookResponseDTO.SuggestBookQuotesDTO suggestBookQuotes(Member member);
+
     BookResponseDTO.SuggestBooksByBookCategoryResultDTO suggestBooksByBookCategory(String categoryName, Member member);
 
     BookResponseDTO.SuggestBooksForUserResultDTO suggestBooksForUser(Member member);

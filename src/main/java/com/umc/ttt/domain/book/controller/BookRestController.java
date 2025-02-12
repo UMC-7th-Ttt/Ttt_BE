@@ -36,6 +36,13 @@ public class BookRestController {
         return ApiResponse.onSuccess(books);
     }
 
+    @GetMapping("/book-quotes-suggestions")
+    @Operation(summary = "책 추천 글귀 조회 - 블라인드 북 위젯", description = "책 추천 글귀 조회 API이며, 12시간마다 새로운 글귀를 랜덤 반환합니다.")
+    public ApiResponse<BookResponseDTO.SuggestBookQuotesDTO> suggestBookQuotes(@CurrentMember Member member) {
+        BookResponseDTO.SuggestBookQuotesDTO book = bookQueryService.suggestBookQuotes(member);
+        return ApiResponse.onSuccess(book);
+    }
+
     @GetMapping("/search")
     @Operation(summary = "책 검색", description = "책 검색 API이며, 검색 결과는 커서를 기반으로 페이징 처리됩니다.\n\n" +
             "첫 페이지 조회 시 cursor 값으로 0을 전달해주세요.\n\n" +

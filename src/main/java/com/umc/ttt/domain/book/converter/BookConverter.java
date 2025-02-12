@@ -52,6 +52,14 @@ public class BookConverter {
                 .build();
     }
 
+    public static BookResponseDTO.SuggestBookQuotesDTO toSuggestBookQuotesDTO(Book book) {
+        return BookResponseDTO.SuggestBookQuotesDTO.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .mainSentences(book.getMainSentences())
+                .build();
+    }
+
     public static BookResponseDTO.SearchBookResultDTO toSearchBooksResultDTO(List<Book> books, long nextCursor, int limit, boolean hasNext, List<Long> scrapedBookIds) {
         List<BookResponseDTO.BookInfoDTO> bookInfoList = books.stream()
                 .map(book -> toBookInfoDTO(book, scrapedBookIds.contains(book.getId())))

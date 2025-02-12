@@ -45,6 +45,16 @@ public class BookResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SuggestBookQuotesDTO {
+        private Long id;
+        private String title;
+        private String mainSentences;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SuggestBooksByBookCategoryResultDTO {
         private List<BookInfoDTO> books;
     }
