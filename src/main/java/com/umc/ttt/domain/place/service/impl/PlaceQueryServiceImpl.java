@@ -106,16 +106,19 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
 
     @Override
     public PlaceResponseDTO.PlaceSuggestListDTO suggestPlaces(Member member) {
-        List<MemberPreferredCategory> preferredCategories = memberPreferredCategoryRepository.findByMember(member);
+        List<MemberPreferredCategory> preferredCategories =
+                Optional.ofNullable(memberPreferredCategoryRepository.findByMember(member))
+                        .orElse(Collections.emptyList());
 
         boolean preferBookstore = false;
         boolean preferCafe = false;
 
-        if (preferredCategories != null && !preferredCategories.isEmpty()) {
-            for (MemberPreferredCategory preferredCategory : preferredCategories) {
-                if (preferredCategory.getBookFormatCategory().getId() == 6) {   // 독립서점
+        for (MemberPreferredCategory preferredCategory : preferredCategories) {
+            if (preferredCategory.getBookFormatCategory() != null) {
+                Long categoryId = preferredCategory.getBookFormatCategory().getId();
+                if (categoryId == 6) {   // 독립서점
                     preferBookstore = true;
-                } else if (preferredCategory.getBookFormatCategory().getId() == 7) { // 북카페
+                } else if (categoryId == 7) { // 북카페
                     preferCafe = true;
                 }
             }
