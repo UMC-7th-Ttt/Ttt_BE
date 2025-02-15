@@ -122,7 +122,6 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
     // 홈 화면에 나의 활동(북클럽)
     public List<HomeResponseDTO.bookClubDTO> getActiveBookClubs(Long memberId){
         List<BookClubMember> bookClubsMember = bookClubMemberRepository.findActiveBookClubsByMember(memberId);
-        System.out.println("111111111111111111111111-"+bookClubsMember.size());
 
         return bookClubsMember.stream()
                 .map(bookClubMember -> {
