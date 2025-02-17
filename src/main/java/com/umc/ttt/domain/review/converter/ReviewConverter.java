@@ -34,11 +34,19 @@ public class ReviewConverter {
 
     // 서평 캘린더 보기
     public static ReviewResponseDTO.reviewCalendarDTO reviewCalendarDTO(Review review) {
-        return ReviewResponseDTO.reviewCalendarDTO.builder()
-                .id(review.getId())
-                .cover(review.getBook().getCover())
-                .writeDate(review.getWriteDate())
-                .build();
+        if(review.getBook()!=null){
+            return ReviewResponseDTO.reviewCalendarDTO.builder()
+                    .id(review.getId())
+                    .cover(review.getBook().getCover())
+                    .writeDate(review.getWriteDate())
+                    .build();
+        }else{
+            return ReviewResponseDTO.reviewCalendarDTO.builder()
+                    .id(review.getId())
+                    .cover(review.getPlace().getImage())
+                    .writeDate(review.getWriteDate())
+                    .build();
+        }
     }
 
     public static ReviewResponseDTO.reviewCalendarListDTO reviewCalendarListDTO(List<Review> reviewList) {
