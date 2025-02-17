@@ -36,6 +36,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findByBookId(Long bookId);
 
-    @Query("SELECT r FROM Review r WHERE YEAR(r.writeDate) = YEAR(CURRENT_DATE) AND r.member = :member ORDER BY FUNCTION('RAND')")
+    @Query("SELECT r FROM Review r WHERE YEAR(r.writeDate) = YEAR(CURRENT_DATE) AND r.member = :member AND r.book IS NOT NULL ORDER BY FUNCTION('RAND')")
     List<Review> findRandomReviewByYearAndMember(Pageable pageable, Member member);
 }
