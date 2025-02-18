@@ -62,4 +62,8 @@ public class Book {
     public void updateRating(double averageBookRating) {
         this.rating = averageBookRating;
     }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
 }

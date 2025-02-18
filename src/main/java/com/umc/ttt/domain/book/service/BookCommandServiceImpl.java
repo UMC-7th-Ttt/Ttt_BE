@@ -63,22 +63,26 @@ public class BookCommandServiceImpl implements BookCommandService {
 
             // 상품 조회 API 가져오기
             for (BookFetchDTO.Item item : response.getItem()) {
-                if (bookRepository.findByIsbn(item.getIsbn()).isPresent()) {
-                    continue;
-                }
+                bookRepository.findByIsbn(item.getIsbn()).ifPresentOrElse(
+                        existingBook -> {
+                            // 기존 ISBN을 ISBN13으로 업데이트
+                            existingBook.setIsbn(item.getIsbn13());
+                            bookRepository.save(existingBook);
+                        },
+                        () -> {
+                            String lookupUrl = String.format(itemLookupUrl + itemQueryParams, ttbkey, item.getIsbn());
+                            BookFetchDTO lookupResponse = restTemplate.getForObject(lookupUrl, BookFetchDTO.class);
 
-                String lookupUrl = String.format(itemLookupUrl + itemQueryParams, ttbkey, item.getIsbn());
-                BookFetchDTO lookupResponse = restTemplate.getForObject(lookupUrl, BookFetchDTO.class);
+                            if (lookupResponse != null && lookupResponse.getItem() != null && !lookupResponse.getItem().isEmpty()) {
+                                BookFetchDTO.Item lookupItem = lookupResponse.getItem().get(0);
+                                item.setItemPage(lookupItem.getItemPage());
+                                item.setHasEbook(lookupItem.getHasEbook());
+                            }
 
-                if (lookupResponse != null && lookupResponse.getItem() != null && !lookupResponse.getItem().isEmpty()) {
-                    BookFetchDTO.Item lookupItem = lookupResponse.getItem().get(0);
-
-                    item.setItemPage(lookupItem.getItemPage());
-                    item.setHasEbook(lookupItem.getHasEbook());
-                }
-
-                Book bookEntity = BookConverter.toEntity(item, category);
-                bookRepository.save(bookEntity);
+                            Book bookEntity = BookConverter.toEntity(item, category);
+                            bookRepository.save(bookEntity);
+                        }
+                );
             }
         }
     }

@@ -34,6 +34,7 @@ public class BookFetchDTO {
         private String author;
         private String cover;
         private String isbn;
+        private String isbn13;
         private String publisher;
         private String description;
         private int bestRank;
