@@ -17,8 +17,9 @@ public interface BookClubRepository extends JpaRepository<BookClub, Long> {
     @Query("SELECT bc FROM BookClub bc " +
             "JOIN BookClubMember bcm ON bc.id = bcm.bookClub.id " +
             "WHERE bcm.member = :member " +
-            "AND bc.endDate BETWEEN :now AND :endOfMonth")
-    List<BookClub> findMyBookClubs(Member member, LocalDate now, LocalDate endOfMonth);
+            "AND bc.startDate <= :now " +
+            "AND bc.endDate >= :now")
+    List<BookClub> findMyBookClubs(Member member, LocalDate now);
 
     @Query("""
         SELECT bc FROM BookClub bc

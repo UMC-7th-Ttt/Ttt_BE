@@ -121,9 +121,8 @@ public class BookClubServiceImpl implements BookClubService{
     @Transactional(readOnly = true)
     public BookClubResponseDTO.bookClubListDTO myBookClubs(Member member) {
         LocalDate now = LocalDate.now();
-        LocalDate endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth());
 
-        List<BookClub> bookClubs = bookClubRepository.findMyBookClubs(member, now, endOfMonth);
+        List<BookClub> bookClubs = bookClubRepository.findMyBookClubs(member, now);
 
         List<BookClubResponseDTO.bookClubDTO> bookClubDTOs = bookClubs.stream()
                 .map(bookClub -> {
