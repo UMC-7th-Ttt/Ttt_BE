@@ -17,8 +17,6 @@ public class ReadingRecordRequestDTO {
         private String content;
         @NotNull(message = "현재 쪽수는 필수입니다.")
         private int currentPage;
-        @NotNull(message = "인증 사진은 필수입니다.")
-        private String imgUrl;
         private boolean isSecret;
     }
 }

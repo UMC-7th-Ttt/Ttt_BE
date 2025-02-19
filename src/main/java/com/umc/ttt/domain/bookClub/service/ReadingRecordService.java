@@ -5,9 +5,10 @@ import com.umc.ttt.domain.bookClub.dto.ReadingRecordRequestDTO;
 import com.umc.ttt.domain.bookClub.dto.ReadingRecordResponseDTO;
 import com.umc.ttt.domain.bookClub.entity.ReadingRecord;
 import com.umc.ttt.domain.member.entity.Member;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ReadingRecordService {
-    public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, Member member);
+    public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, MultipartFile readingRecordPicture, Member member);
 
     public ReadingRecordResponseDTO.GetReadingRecordListResultDTO getReadingRecordList(Member member);
 
