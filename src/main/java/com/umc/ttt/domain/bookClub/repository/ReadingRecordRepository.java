@@ -35,4 +35,6 @@ public interface ReadingRecordRepository extends JpaRepository<ReadingRecord, Lo
     """)
     Slice<ReadingRecord> findReadingRecordsWithCursor(@Param("memberId") Long memberId, @Param("cursor") Long cursor,
                                                       Pageable pageable);
+
+    boolean existsByBookClubMember(BookClubMember bookClubMember);
 }

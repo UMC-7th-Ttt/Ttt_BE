@@ -58,11 +58,12 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
         // BookClubMember에서 멤버 리스트 조회
         List<BookClubMember> bookClubMembers = bookClubMemberRepository.findByBookClub(bookClub);
 
-        List<MemberResponseDTO.MemberInfoDTO> memberInfoDTOList = MemberConverter.toMemberInfoListDTO(
-                bookClubMembers.stream()
-                        .map(BookClubMember::getMember)
-                        .toList()
-        );
+        List<BookClubResponseDTO.BookClubMemberInfoDTO> bookClubMemberInfoDTOList = bookClubMembers.stream()
+                .map(bookClubMember -> {
+                    boolean hasReviewed = readingRecordRepository.existsByBookClubMember(bookClubMember);
+                    return BookClubConverter.toBookClubMemberInfoDTO(bookClubMember, hasReviewed);
+                })
+                .collect(Collectors.toList());
 
         // 사용자 참여 인증 조회
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
@@ -81,7 +82,7 @@ public class BookClubQueryServiceImpl implements BookClubQueryService {
                 .orElse(0);
         int recommendedCompletionRate = calculateRecommendedCompletionRate(book.getItemPage(), 4, bookClub.getStartDate());
 
-        return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, memberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
+        return BookClubConverter.toGetBookClubDetailsResultDTO(bookClub, bookInfoDTO, bookClubMemberInfoDTOList, elapsedWeeks, myCompletionRate, recommendedCompletionRate);
     }
 
     @Override
