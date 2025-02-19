@@ -8,12 +8,12 @@ import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 
 public class ReadingRecordConverter {
-    public static ReadingRecord toReadingRecord(ReadingRecordRequestDTO.ReadingRecordDTO request, BookClubMember bookClubMember) {
+    public static ReadingRecord toReadingRecord(ReadingRecordRequestDTO.ReadingRecordDTO request, String pictureUrl, BookClubMember bookClubMember) {
         return ReadingRecord.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
                 .currentPage(request.getCurrentPage())
-                .imgUrl(request.getImgUrl())
+                .imgUrl(pictureUrl)
                 .isSecret(request.getIsSecret())
                 .bookClubMember(bookClubMember)
                 .build();

@@ -16,16 +16,23 @@ import com.umc.ttt.domain.member.converter.MemberConverter;
 import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import com.umc.ttt.domain.member.entity.Member;
 import com.umc.ttt.global.apiPayload.code.status.ErrorStatus;
+import com.umc.ttt.global.aws.s3.entity.Uuid;
+import com.umc.ttt.global.aws.s3.repository.UuidRepository;
+import com.umc.ttt.global.aws.s3.service.AmazonS3Manager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.google.common.io.Files.getFileExtension;
 
 @Service
 @RequiredArgsConstructor
@@ -35,15 +42,32 @@ public class ReadingRecordServiceImpl implements ReadingRecordService {
     private final BookClubRepository bookClubRepository;
     private final BookClubMemberRepository bookClubMemberRepository;
 
+    private final AmazonS3Manager s3Manager;
+    private final UuidRepository uuidRepository;
+
     @Override
-    public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, Member member) {
+    public ReadingRecord createReadingRecord(Long bookClubId, ReadingRecordRequestDTO.ReadingRecordDTO request, MultipartFile readingRecordPicture, Member member) {
         BookClub bookClub = bookClubRepository.findById(bookClubId)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.BOOK_CLUB_NOT_FOUND));
+
+        String pictureUrl = null;
+
+        if (readingRecordPicture != null && !readingRecordPicture.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            String fileExtension = getFileExtension(readingRecordPicture.getOriginalFilename());
+
+            String s3Key = s3Manager.generateProfileKeyName(savedUuid) + "." + fileExtension;
+
+            pictureUrl = s3Manager.uploadFile(s3Key, readingRecordPicture);
+        }
 
         BookClubMember bookClubMember = bookClubMemberRepository.findByBookClubAndMember(bookClub, member)
                 .orElseThrow(() -> new BookClubHandler(ErrorStatus.MEMBER_NOT_FOUND_IN_BOOK_CLUB));
 
-        ReadingRecord readingRecord = ReadingRecordConverter.toReadingRecord(request, bookClubMember);
+        ReadingRecord readingRecord = ReadingRecordConverter.toReadingRecord(request, pictureUrl, bookClubMember);
 
         return readingRecordRepository.save(readingRecord);
     }
