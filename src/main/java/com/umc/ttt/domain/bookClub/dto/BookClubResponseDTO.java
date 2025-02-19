@@ -1,7 +1,6 @@
 package com.umc.ttt.domain.bookClub.dto;
 
 import com.umc.ttt.domain.book.dto.BookResponseDTO;
-import com.umc.ttt.domain.member.dto.MemberResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,7 +68,18 @@ public class BookClubResponseDTO {
         Integer myCompletionRate;
         Integer recommendedCompletionRate;
         BookResponseDTO.BookInfoDTO bookInfo;
-        List<MemberResponseDTO.MemberInfoDTO> members;
+        List<BookClubMemberInfoDTO> members;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BookClubMemberInfoDTO {
+        Long id;
+        String nickname;
+        String profileUrl;
+        boolean hasReviewed;
     }
 
     @Builder
