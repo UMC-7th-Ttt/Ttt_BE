@@ -29,6 +29,13 @@ public class BookRestController {
         return ApiResponse.onSuccess("알라딘 Open API 데이터가 저장되었습니다.");
     }
 
+    @PatchMapping("/fetchImage")
+    @Operation(summary = "카카오 도서 Open API 이미지 데이터 저장", description = "서버 테스트용 api입니다. 연동x")
+    public ApiResponse<String> fetchBooksImage() {
+        bookCommandService.fetchBooksImage();
+        return ApiResponse.onSuccess("카카오 도서 Open API 이미지 데이터가 저장되었습니다.");
+    }
+
     @GetMapping("/bestsellers")
     @Operation(summary = "베스트셀러 6권 조회 - 취향 분석", description = "베스트셀러 6권 조회 API이며, 취향 분석에 필요한 표지, 주요 문장 등을 제공합니다.")
     public ApiResponse<BookResponseDTO.GetBestSellersResultDTO> getBestSellers(@CurrentMember Member member) {

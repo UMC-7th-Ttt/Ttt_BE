@@ -1,5 +1,7 @@
 package com.umc.ttt.domain.book.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.ttt.domain.book.converter.BookConverter;
 import com.umc.ttt.domain.book.dto.BookFetchDTO;
 import com.umc.ttt.domain.book.entity.Book;
@@ -8,6 +10,10 @@ import com.umc.ttt.domain.book.repository.BookCategoryRepository;
 import com.umc.ttt.domain.book.repository.BookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -38,13 +44,18 @@ public class BookCommandServiceImpl implements BookCommandService {
     @Value("${aladin.api.ttbkey}")
     private String ttbkey;
 
+    @Value("${kakao-books.api.base-url}")
+    private String kakaoBaseUrl;
+
+    @Value("${kakao-books.api.query-params}")
+    private String kakaoQueryParams;
+
+    @Value("${kakao-books.api.ttbkey}")
+    private String kakaoTtbkey;
+
     @Override
     @Transactional
     public void fetchBooks() {
-        if (ttbkey == null) {
-            throw new RuntimeException("환경변수 ALADIN_TTBKEY가 설정되어 있지 않습니다.");
-        }
-
         int maxResults = 50;
         int startPage = 1;
 
@@ -83,6 +94,60 @@ public class BookCommandServiceImpl implements BookCommandService {
                             bookRepository.save(bookEntity);
                         }
                 );
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void fetchBooksImage() {
+        List<Book> books = bookRepository.findAll();
+
+        if (books.isEmpty()) {
+            System.out.println("DB에 저장된 도서가 없습니다.");
+            return;
+        }
+
+        String kakaoApiBaseUrl = kakaoBaseUrl + kakaoQueryParams;
+        String authorizationHeader = "KakaoAK " + kakaoTtbkey;
+
+        for (Book book : books) {
+            String isbn = book.getIsbn();
+            if (isbn == null || isbn.isEmpty()) {
+                continue;
+            }
+
+            // 카카오 API 호출
+            String apiUrl = kakaoApiBaseUrl + isbn;
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", authorizationHeader);
+                headers.set("Content-Type", "application/json");
+
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+
+                ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.GET, entity, String.class);
+
+                if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode root = objectMapper.readTree(response.getBody());
+
+                    JsonNode documents = root.path("documents");
+                    if (documents.isArray() && documents.size() > 0) {
+                        String thumbnail = documents.get(0).path("thumbnail").asText();
+                        if (thumbnail != null && !thumbnail.isEmpty()) {
+                            book.setCover(thumbnail);
+                            bookRepository.save(book);
+                        }
+                    } else {
+                        System.out.println("카카오 API 응답에 도서 정보가 없습니다: " + book.getTitle());
+                    }
+                } else {
+                    System.out.println("카카오 API 호출 실패: " + response.getStatusCode());
+                }
+
+            } catch (Exception e) {
+                System.out.println("카카오 API 호출 중 오류 발생 (ISBN: " + isbn + "): " + e.getMessage());
             }
         }
     }

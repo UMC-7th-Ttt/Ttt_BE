@@ -66,4 +66,8 @@ public class Book {
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
 }
