@@ -11,7 +11,11 @@ import java.util.List;
 public interface ReviewCommandService {
     Review addReview(ReviewRequestDTO.AddUpdateDto request, Member member);
     Review updateReview(Long reviewId, ReviewRequestDTO.AddUpdateDto request, Member member);
+    Review updateBookReview(Long reviewId, ReviewRequestDTO.AddUpdateBookReviewDto request);
+    Review updatePlaceReview(Long reviewId, ReviewRequestDTO.AddUpdatePlaceReviewDto request);
     void deleteReview(Long reviewId);
+    Review deleteBookReview(Long reviewId);
+    Review deletePlaceReview(Long reviewId);
     List<Review> getReviewCalendar(int year, int month, Member member);
     ReviewResponseDTO.reviewListDTO getReviewList(Long cursor, int limit, Member member);
     Review getReviewInfo(Long reviewId);

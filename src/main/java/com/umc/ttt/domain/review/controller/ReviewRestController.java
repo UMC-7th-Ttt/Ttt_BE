@@ -45,6 +45,40 @@ public class ReviewRestController {
         return ApiResponse.onSuccess(null);
     }
 
+    // 서평 책 삭제
+    @DeleteMapping("/{reviewId}/book")
+    @Operation(summary = "책 리뷰 삭제", description = "책 리뷰를 삭제하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> deleteBookReview(@PathVariable(name = "reviewId") Long reviewId){
+        Review review = reviewCommandService.deleteBookReview(reviewId);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
+    // 서평 도서 삭제
+    @DeleteMapping("/{reviewId}/place")
+    @Operation(summary = "장소 리뷰 삭제", description = "장소 리뷰를 삭제하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> deletePlaceReview(@PathVariable(name = "reviewId") Long reviewId){
+        Review review = reviewCommandService.deletePlaceReview(reviewId);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
+    // 서평 책 수정
+    @PatchMapping("/{reviewId}/book")
+    @Operation(summary = "책 별점 수정(별점 삭제 후 추가할 때)", description = "책 별점을 수정하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> updateReview(@PathVariable(name = "reviewId") Long reviewId,
+                                                                          @RequestBody @Valid ReviewRequestDTO.AddUpdateBookReviewDto request) {
+        Review review = reviewCommandService.updateBookReview(reviewId, request);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
+    // 서평 장소 수정
+    @PatchMapping("/{reviewId}/place")
+    @Operation(summary = "장소 별점 수정(별점 삭제 후 추가할 때)", description = "장소 별점을 수정하는 API입니다.")
+    public ApiResponse<ReviewResponseDTO.AddUpdateResultDTO> updateReview(@PathVariable(name = "reviewId") Long reviewId,
+                                                                          @RequestBody @Valid ReviewRequestDTO.AddUpdatePlaceReviewDto request) {
+        Review review = reviewCommandService.updatePlaceReview(reviewId, request);
+        return ApiResponse.onSuccess(ReviewConverter.toAddUpdateResultDTO(review));
+    }
+
 
     @GetMapping("/calendar")
     @Operation(summary = "서평 보기-캘린더",description = "캘린더로 작성한 서평을 조회하는 API입니다.")

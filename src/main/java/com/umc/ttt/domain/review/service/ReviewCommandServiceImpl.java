@@ -183,6 +183,48 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         return review;
     }
 
+    // 책 서평 수정
+    @Override
+    public Review updateBookReview(Long reviewId, ReviewRequestDTO.AddUpdateBookReviewDto request) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        Book removeBook = review.getBook();
+
+        Book updateBook = updateBookReview(review, request.getBookId(), request.getBookRanking());
+
+        reviewRepository.save(review);
+
+        if(removeBook != null){
+            updateBookRanking(removeBook);
+        }
+        if(updateBook != null){
+            updateBookRanking(updateBook);
+        }
+
+        return review;
+    }
+
+    // 장소 서평 추가
+    @Override
+    public Review updatePlaceReview(Long reviewId, ReviewRequestDTO.AddUpdatePlaceReviewDto request) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        Place removePlace = review.getPlace();
+
+        Place updatePlace = updatePlaceReview(review, request.getPlaceId(), request.getPlaceRanking());
+
+        reviewRepository.save(review);
+
+        if(removePlace != null){
+            updatePlaceRanking(removePlace);
+        }
+        if(updatePlace != null){
+            updatePlaceRanking(updatePlace);
+        }
+
+        return review;
+    }
+
     @Override
     @Transactional
     public void deleteReview(Long reviewId) {
@@ -196,6 +238,37 @@ public class ReviewCommandServiceImpl implements ReviewCommandService {
         if(review.getPlace()!=null){
             updatePlaceRanking(review.getPlace());
         }
+    }
+
+    @Override
+    public Review deleteBookReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        Book removeBook = review.getBook();
+        review.setBookReview(0,null);
+        reviewRepository.save(review);
+
+        if(removeBook != null){
+            updateBookRanking(removeBook);
+        }
+
+        return review;
+    }
+
+    @Override
+    public Review deletePlaceReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()-> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        Place removePlace = review.getPlace();
+        review.setPlaceReview(0,null);
+
+        reviewRepository.save(review);
+
+        if(removePlace != null){
+            updatePlaceRanking(removePlace);
+        }
+
+        return review;
     }
 
     // 서평 캘린더 보기
