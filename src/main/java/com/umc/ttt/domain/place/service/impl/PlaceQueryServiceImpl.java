@@ -149,8 +149,8 @@ public class PlaceQueryServiceImpl implements PlaceQueryService {
 
     @Override
     public PlaceResponseDTO.EditorPickPlaceListDTO getEditorPickPlaces(Member member) {
-        // 에디터 픽 공간 5곳 - 로이 픽
-        List<String> titles = Arrays.asList("북앤드로잉", "유어마인드", "북파크", "땡스북스", "책방오늘");
+        // 에디터 픽 공간 5곳
+        List<String> titles = Arrays.asList("동경책방", "유어마인드", "쏘블루", "갑을문고", "북눅연남");
 
         List<Place> places = titles.stream()
                 .map(placeRepository::findPlaceByTitle)
