@@ -22,4 +22,16 @@ public class ReviewRequestDTO {
         Long bookId;
         Long placeId;
     }
+
+    @Getter
+    public static class AddUpdateBookReviewDto{
+        Long bookId;
+        double bookRanking;
+    }
+
+    @Getter
+    public static class AddUpdatePlaceReviewDto{
+        Long placeId;
+        double placeRanking;
+    }
 }
